@@ -1,0 +1,225 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+- "ValueTreeBuilder"
+provides-nominal:
+- "C8Impeller16ValueTreeBuilder"
+provides-member:
+- ["C8Impeller16ValueTreeBuilder", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- "WriteRepository"
+- "StorablePrimitive"
+- "String"
+- !private "ValueTreeReference"
+- "AssignmentPrecedence"
+- "ValueTree"
+- !private "Primitive"
+- !private "!="
+- "Storable"
+- "ValueTreeBuilder"
+- "TernaryPrecedence"
+depends-member:
+- !private ["Ps9AnyObject", "Primitive"]
+- !private ["Ps9AnyObject", "T"]
+- !private ["Ps9AnyObject", "ValueTree"]
+- !private ["Ps9AnyObject", "ValueTreeReference"]
+- !private ["Ps9AnyObject", "init"]
+- !private ["Ps9AnyObject", "set"]
+- !private ["Ps9AnyObject", "storable"]
+- !private ["Ps9AnyObject", "valueTree"]
+- ["Ps9AnyObject", "write"]
+- ["Ps9AnyObject", ""]
+- !private ["Sa", "Iterator"]
+- !private ["Sa", "_Element"]
+- ["Sa", "deinit"]
+- !private ["Sa", "map"]
+- !private ["Ps23BidirectionalCollection", "Iterator"]
+- !private ["Ps23BidirectionalCollection", "_Element"]
+- !private ["Ps23BidirectionalCollection", "map"]
+- !private ["Ps22BidirectionalIndexable", "Iterator"]
+- !private ["Ps22BidirectionalIndexable", "_Element"]
+- !private ["Ps22BidirectionalIndexable", "map"]
+- !private ["Sb", "_getBuiltinLogicValue"]
+- ["Sb", "deinit"]
+- !private ["Ps7CVarArg", "Iterator"]
+- !private ["Ps7CVarArg", "_Element"]
+- !private ["Ps7CVarArg", "map"]
+- !private ["Ps10Collection", "Iterator"]
+- !private ["Ps10Collection", "_Element"]
+- !private ["Ps10Collection", "map"]
+- !private ["Ps28CustomDebugStringConvertible", "Iterator"]
+- !private ["Ps28CustomDebugStringConvertible", "_Element"]
+- !private ["Ps28CustomDebugStringConvertible", "map"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
+- !private ["Ps17CustomReflectable", "Iterator"]
+- !private ["Ps17CustomReflectable", "_Element"]
+- !private ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
+- !private ["Ps17CustomReflectable", "map"]
+- !private ["Ps23CustomStringConvertible", "Iterator"]
+- !private ["Ps23CustomStringConvertible", "_Element"]
+- !private ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
+- !private ["Ps23CustomStringConvertible", "map"]
+- !private ["Ps9Equatable", "_getBuiltinLogicValue"]
+- !private ["Ps9Equatable", "init"]
+- !private ["Ps9Equatable", "optionalPrimitive"]
+- !private ["Ps9Equatable", "optionalValueTreeReference"]
+- !private ["Ps9Equatable", "primitive"]
+- !private ["Ps9Equatable", "primitives"]
+- !private ["Ps9Equatable", "set"]
+- !private ["Ps9Equatable", "uniqueIdentifier"]
+- !private ["Ps9Equatable", "valueTreeReference"]
+- !private ["Ps9Equatable", "valueTreeReferences"]
+- !private ["Ps25ExpressibleByArrayLiteral", "Iterator"]
+- !private ["Ps25ExpressibleByArrayLiteral", "_Element"]
+- !private ["Ps25ExpressibleByArrayLiteral", "map"]
+- !private ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
+- !private ["Ps8Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps8Hashable", "init"]
+- !private ["Ps8Hashable", "set"]
+- !private ["Ps9Indexable", "Iterator"]
+- !private ["Ps9Indexable", "_Element"]
+- !private ["Ps9Indexable", "map"]
+- !private ["Ps13IndexableBase", "Iterator"]
+- !private ["Ps13IndexableBase", "_Element"]
+- !private ["Ps13IndexableBase", "map"]
+- !private ["Vs16IndexingIterator", "Element"]
+- !private ["Ps16IteratorProtocol", "Element"]
+- !private ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
+- ["V8Impeller8Metadata", "deinit"]
+- !private ["V8Impeller8Metadata", "uniqueIdentifier"]
+- !private ["Ps17MutableCollection", "Iterator"]
+- !private ["Ps17MutableCollection", "_Element"]
+- !private ["Ps17MutableCollection", "map"]
+- !private ["Ps16MutableIndexable", "Iterator"]
+- !private ["Ps16MutableIndexable", "_Element"]
+- !private ["Ps16MutableIndexable", "map"]
+- ["Sq", "deinit"]
+- ["O8Impeller9Primitive", "deinit"]
+- !private ["O8Impeller9Primitive", "init"]
+- ["O8Impeller8Property", "deinit"]
+- !private ["O8Impeller8Property", "optionalPrimitive"]
+- !private ["O8Impeller8Property", "optionalValueTreeReference"]
+- !private ["O8Impeller8Property", "primitive"]
+- !private ["O8Impeller8Property", "primitives"]
+- !private ["O8Impeller8Property", "valueTreeReference"]
+- !private ["O8Impeller8Property", "valueTreeReferences"]
+- !private ["Ps22RandomAccessCollection", "Iterator"]
+- !private ["Ps22RandomAccessCollection", "_Element"]
+- !private ["Ps22RandomAccessCollection", "map"]
+- !private ["Ps21RandomAccessIndexable", "Iterator"]
+- !private ["Ps21RandomAccessIndexable", "_Element"]
+- !private ["Ps21RandomAccessIndexable", "map"]
+- !private ["Ps26RangeReplaceableCollection", "Iterator"]
+- !private ["Ps26RangeReplaceableCollection", "_Element"]
+- !private ["Ps26RangeReplaceableCollection", "map"]
+- !private ["Ps25RangeReplaceableIndexable", "Iterator"]
+- !private ["Ps25RangeReplaceableIndexable", "_Element"]
+- !private ["Ps25RangeReplaceableIndexable", "map"]
+- !private ["Ps8Sequence", "Element"]
+- !private ["Ps8Sequence", "Iterator"]
+- !private ["Ps8Sequence", "_Element"]
+- !private ["Ps8Sequence", "map"]
+- !private ["P8Impeller8Storable", "metadata"]
+- !private ["P8Impeller8Storable", "storedType"]
+- !private ["P8Impeller8Storable", "write"]
+- !private ["P8Impeller17StorablePrimitive", "_getBuiltinLogicValue"]
+- ["SS", "deinit"]
+- ["C8Impeller9ValueTree", "deinit"]
+- !private ["C8Impeller9ValueTree", "init"]
+- !private ["C8Impeller9ValueTree", "set"]
+- !private ["C8Impeller16ValueTreeBuilder", "Primitive"]
+- ["C8Impeller16ValueTreeBuilder", "Storable"]
+- ["C8Impeller16ValueTreeBuilder", "StorablePrimitive"]
+- ["C8Impeller16ValueTreeBuilder", "String"]
+- ["C8Impeller16ValueTreeBuilder", "T"]
+- ["C8Impeller16ValueTreeBuilder", "ValueTree"]
+- !private ["C8Impeller16ValueTreeBuilder", "ValueTreeReference"]
+- ["C8Impeller16ValueTreeBuilder", "deinit"]
+- ["C8Impeller16ValueTreeBuilder", "init"]
+- !private ["C8Impeller16ValueTreeBuilder", "storable"]
+- ["C8Impeller16ValueTreeBuilder", "valueTree"]
+- ["C8Impeller16ValueTreeBuilder", "write"]
+- ["V8Impeller18ValueTreeReference", "deinit"]
+- !private ["V8Impeller18ValueTreeReference", "init"]
+- !private ["P8Impeller15WriteRepository", "Primitive"]
+- !private ["P8Impeller15WriteRepository", "T"]
+- !private ["P8Impeller15WriteRepository", "ValueTree"]
+- !private ["P8Impeller15WriteRepository", "ValueTreeReference"]
+- !private ["P8Impeller15WriteRepository", "storable"]
+- !private ["P8Impeller15WriteRepository", "valueTree"]
+- ["P8Impeller15WriteRepository", "write"]
+- ["P8Impeller15WriteRepository", ""]
+- !private ["Ps14_ArrayProtocol", "Iterator"]
+- !private ["Ps14_ArrayProtocol", "_Element"]
+- !private ["Ps14_ArrayProtocol", "map"]
+- !private ["Ps24_DestructorSafeContainer", "Iterator"]
+- !private ["Ps24_DestructorSafeContainer", "_Element"]
+- !private ["Ps24_DestructorSafeContainer", "map"]
+- !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
+- !private ["Ps9_Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps9_Hashable", "init"]
+- !private ["Ps9_Hashable", "set"]
+- !private ["Ps21_ObjectiveCBridgeable", "Iterator"]
+- !private ["Ps21_ObjectiveCBridgeable", "_Element"]
+- !private ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
+- !private ["Ps21_ObjectiveCBridgeable", "map"]
+- ["Vs26_OptionalNilComparisonType", "deinit"]
+depends-nominal:
+- "Ps9AnyObject"
+- "Sa"
+- !private "Ps23BidirectionalCollection"
+- !private "Ps22BidirectionalIndexable"
+- "Sb"
+- !private "Ps7CVarArg"
+- !private "Ps10Collection"
+- !private "Ps28CustomDebugStringConvertible"
+- !private "Ps29CustomPlaygroundQuickLookable"
+- !private "Ps17CustomReflectable"
+- !private "Ps23CustomStringConvertible"
+- !private "Ps9Equatable"
+- !private "Ps25ExpressibleByArrayLiteral"
+- !private "Ps27ExpressibleByBooleanLiteral"
+- !private "Ps8Hashable"
+- !private "Ps9Indexable"
+- !private "Ps13IndexableBase"
+- !private "Vs16IndexingIterator"
+- !private "Ps16IteratorProtocol"
+- !private "Ps25LosslessStringConvertible"
+- "V8Impeller8Metadata"
+- !private "Ps17MutableCollection"
+- !private "Ps16MutableIndexable"
+- "Sq"
+- "O8Impeller9Primitive"
+- "O8Impeller8Property"
+- !private "Ps22RandomAccessCollection"
+- !private "Ps21RandomAccessIndexable"
+- !private "Ps26RangeReplaceableCollection"
+- !private "Ps25RangeReplaceableIndexable"
+- !private "Ps8Sequence"
+- !private "P8Impeller8Storable"
+- !private "P8Impeller17StorablePrimitive"
+- "SS"
+- "C8Impeller9ValueTree"
+- "C8Impeller16ValueTreeBuilder"
+- "V8Impeller18ValueTreeReference"
+- "P8Impeller15WriteRepository"
+- !private "Ps14_ArrayProtocol"
+- !private "Ps24_DestructorSafeContainer"
+- !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
+- !private "Ps9_Hashable"
+- !private "Ps21_ObjectiveCBridgeable"
+- "Vs26_OptionalNilComparisonType"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CloudKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Contacts.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreLocation.swiftmodule"
+interface-hash: "1aab6af09316ccfa66b822bc83f4bd6a"

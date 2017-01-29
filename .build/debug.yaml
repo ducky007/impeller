@@ -1,0 +1,63 @@
+client:
+  name: swift-build
+tools: {}
+targets:
+  "test": ["<Impeller.module>","<ImpellerTests.module>","<NetworkedTests.module>","<ImpellerPackageTests.test>"]
+  "main": ["<Impeller.module>"]
+default: "main"
+commands: 
+  "<Impeller.module>":
+    tool: swift-compiler
+    executable: "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    module-name: "Impeller"
+    module-output-path: "/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.swiftmodule"
+    inputs: []
+    outputs: ["<Impeller.module>","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/CloudKitRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Exchange.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/General.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/JSONSerializer.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/LocalRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Metadata.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/MonolithicRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Primitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Property.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Storable.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/StorablePrimitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTree.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTreeBuilder.swift.o"]
+    import-paths: ["/Users/cormack/CocoaPrograms/impeller/.build/debug"]
+    temps-path: "/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build"
+    objects: ["/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/CloudKitRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Exchange.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/General.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/JSONSerializer.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/LocalRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Metadata.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/MonolithicRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Primitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Property.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Storable.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/StorablePrimitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTree.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTreeBuilder.swift.o"]
+    other-args: ["-j8","-D","SWIFT_PACKAGE","-Onone","-g","-enable-testing","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-target","x86_64-apple-macosx10.10","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk","-module-cache-path","/Users/cormack/CocoaPrograms/impeller/.build/debug/ModuleCache"]
+    sources: ["/Users/cormack/CocoaPrograms/impeller/Sources/CloudKitRepository.swift","/Users/cormack/CocoaPrograms/impeller/Sources/Exchange.swift","/Users/cormack/CocoaPrograms/impeller/Sources/General.swift","/Users/cormack/CocoaPrograms/impeller/Sources/JSONSerializer.swift","/Users/cormack/CocoaPrograms/impeller/Sources/LocalRepository.swift","/Users/cormack/CocoaPrograms/impeller/Sources/Metadata.swift","/Users/cormack/CocoaPrograms/impeller/Sources/MonolithicRepository.swift","/Users/cormack/CocoaPrograms/impeller/Sources/Primitive.swift","/Users/cormack/CocoaPrograms/impeller/Sources/Property.swift","/Users/cormack/CocoaPrograms/impeller/Sources/Storable.swift","/Users/cormack/CocoaPrograms/impeller/Sources/StorablePrimitive.swift","/Users/cormack/CocoaPrograms/impeller/Sources/ValueTree.swift","/Users/cormack/CocoaPrograms/impeller/Sources/ValueTreeBuilder.swift"]
+    is-library: true
+    enable-whole-module-optimization: false
+    num-threads: "8"
+
+  "<ImpellerTests.module>":
+    tool: swift-compiler
+    executable: "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    module-name: "ImpellerTests"
+    module-output-path: "/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.swiftmodule"
+    inputs: ["<Impeller.module>"]
+    outputs: ["<ImpellerTests.module>","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/BasicTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Child.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/ExchangeTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Parent.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Person.swift.o"]
+    import-paths: ["/Users/cormack/CocoaPrograms/impeller/.build/debug"]
+    temps-path: "/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build"
+    objects: ["/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/BasicTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Child.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/ExchangeTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Parent.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Person.swift.o"]
+    other-args: ["-j8","-D","SWIFT_PACKAGE","-Onone","-g","-enable-testing","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-target","x86_64-apple-macosx10.10","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk","-module-cache-path","/Users/cormack/CocoaPrograms/impeller/.build/debug/ModuleCache"]
+    sources: ["/Users/cormack/CocoaPrograms/impeller/Tests/ImpellerTests/BasicTests.swift","/Users/cormack/CocoaPrograms/impeller/Tests/ImpellerTests/Child.swift","/Users/cormack/CocoaPrograms/impeller/Tests/ImpellerTests/ExchangeTests.swift","/Users/cormack/CocoaPrograms/impeller/Tests/ImpellerTests/Parent.swift","/Users/cormack/CocoaPrograms/impeller/Tests/ImpellerTests/Person.swift"]
+    is-library: true
+    enable-whole-module-optimization: false
+    num-threads: "8"
+
+  "<NetworkedTests.module>":
+    tool: swift-compiler
+    executable: "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    module-name: "NetworkedTests"
+    module-output-path: "/Users/cormack/CocoaPrograms/impeller/.build/debug/NetworkedTests.swiftmodule"
+    inputs: []
+    outputs: ["<NetworkedTests.module>","/Users/cormack/CocoaPrograms/impeller/.build/debug/NetworkedTests.build/CloudKitTests.swift.o"]
+    import-paths: ["/Users/cormack/CocoaPrograms/impeller/.build/debug"]
+    temps-path: "/Users/cormack/CocoaPrograms/impeller/.build/debug/NetworkedTests.build"
+    objects: ["/Users/cormack/CocoaPrograms/impeller/.build/debug/NetworkedTests.build/CloudKitTests.swift.o"]
+    other-args: ["-j8","-D","SWIFT_PACKAGE","-Onone","-g","-enable-testing","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-target","x86_64-apple-macosx10.10","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk","-module-cache-path","/Users/cormack/CocoaPrograms/impeller/.build/debug/ModuleCache"]
+    sources: ["/Users/cormack/CocoaPrograms/impeller/Tests/NetworkedTests/CloudKitTests.swift"]
+    is-library: true
+    enable-whole-module-optimization: false
+    num-threads: "8"
+
+  "<ImpellerPackageTests.test>":
+    tool: shell
+    description: "Linking ./.build/debug/ImpellerPackageTests.xctest/Contents/MacOS/ImpellerPackageTests"
+    inputs: ["/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/BasicTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Child.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/ExchangeTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Parent.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Person.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/CloudKitRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Exchange.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/General.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/JSONSerializer.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/LocalRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Metadata.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/MonolithicRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Primitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Property.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Storable.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/StorablePrimitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTree.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTreeBuilder.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/NetworkedTests.build/CloudKitTests.swift.o"]
+    outputs: ["<ImpellerPackageTests.test>","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerPackageTests.xctest/Contents/MacOS/ImpellerPackageTests"]
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-target","x86_64-apple-macosx10.10","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk","-g","-L/Users/cormack/CocoaPrograms/impeller/.build/debug","-o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerPackageTests.xctest/Contents/MacOS/ImpellerPackageTests","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-module-name","ImpellerPackageTests","-Xlinker","-bundle","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/BasicTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Child.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/ExchangeTests.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Parent.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/ImpellerTests.build/Person.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/CloudKitRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Exchange.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/General.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/JSONSerializer.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/LocalRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Metadata.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/MonolithicRepository.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Primitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Property.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/Storable.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/StorablePrimitive.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTree.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/Impeller.build/ValueTreeBuilder.swift.o","/Users/cormack/CocoaPrograms/impeller/.build/debug/NetworkedTests.build/CloudKitTests.swift.o"]
+
