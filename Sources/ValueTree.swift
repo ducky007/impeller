@@ -23,9 +23,8 @@ public struct ValueTreeReference: Equatable, Hashable {
 public final class ValueTree: Equatable, Hashable {
     public var metadata: Metadata
     public var storedType: StoredType
-    public var isDeleted: Bool
     
-    private var propertiesByName = [String:Property]()
+    public private(set) var propertiesByName = [String:Property]()
     
     public var valueTreeReference: ValueTreeReference {
         return ValueTreeReference(uniqueIdentifier: metadata.uniqueIdentifier, storedType: storedType)
@@ -38,14 +37,12 @@ public final class ValueTree: Equatable, Hashable {
     public init(storedType: StoredType, metadata: Metadata) {
         self.storedType = storedType
         self.metadata = metadata
-        self.isDeleted = false
     }
     
     public init(deepCopying other:ValueTree) {
         metadata = other.metadata
         storedType = other.storedType
         propertiesByName = other.propertiesByName
-        isDeleted = other.isDeleted
     }
     
     public func get(_ propertyName: String) -> Property? {
@@ -61,7 +58,7 @@ public final class ValueTree: Equatable, Hashable {
     }
     
     public static func ==(left: ValueTree, right: ValueTree) -> Bool {
-        return left.propertiesByName == right.propertiesByName && left.metadata == right.metadata && left.storedType == right.storedType && left.isDeleted == right.isDeleted
+        return left.propertiesByName == right.propertiesByName && left.metadata == right.metadata && left.storedType == right.storedType
     }
     
     func merged(with other: ValueTree?) -> ValueTree {
@@ -79,7 +76,7 @@ public final class ValueTree: Equatable, Hashable {
             mergedTree.metadata.version = max(metadata.version, other.metadata.version+1)
         }
         
-        mergedTree.isDeleted = isDeleted || other.isDeleted
+        mergedTree.metadata.isDeleted = metadata.isDeleted || other.metadata.isDeleted
         
         return mergedTree
     }

@@ -24,7 +24,6 @@ public struct CloudKitCursor: Cursor {
 }
 
 
-@available ()
 public class CloudKitRepository: Exchangable {
     
     public let uniqueIdentifier: UniqueIdentifier
