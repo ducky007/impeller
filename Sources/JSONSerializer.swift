@@ -9,8 +9,6 @@
 import Foundation
 
 
-/*
-
 protocol JSONRepresentable {
     init(withJSONObject jsonObject: AnyObject) throws
     func JSONObject() -> AnyObject
@@ -49,30 +47,68 @@ extension ValueTree: JSONRepresentable {
             JSONKey.uniqueIdentifier.rawValue : metadata.uniqueIdentifier,
             JSONKey.timestamp.rawValue : metadata.timestamp,
             JSONKey.isDeleted.rawValue : metadata.isDeleted,
-            JSONKey.version.rawValue : metadata.version]
+            JSONKey.version.rawValue : metadata.version
+        ]
         json[JSONKey.metadata.rawValue] = metadataDict
         json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { property in
-            // return property.asJSONObject()
+            return property.JSONObject()
         }
         return json as AnyObject
     }
     
-        
-  /*
-    private var propertiesByName = [String:Property]() */
-    
-}*/
+}
 
-/*
+
 extension Property: JSONRepresentable {
+    
+    public enum JSONKey: String {
+        case type, value, referencedType, referencedIdentifier
+    }
     
     public init(withJSONObject jsonObject: AnyObject) throws {
         
     }
     
-    public func asJSONObject() -> AnyObject {
-        
+    public func JSONObject() -> AnyObject {
+        var result = [String:Any]()
+        switch self {
+        case .primitive(let primitive):
+            result[JSONKey.type.rawValue] = primitive.type.rawValue
+            result[JSONKey.value.rawValue] = primitive.value
+        case .optionalPrimitive(let primitive):
+            if let primitive = primitive {
+                result[JSONKey.type.rawValue] = primitive.type.rawValue
+                result[JSONKey.value.rawValue] = primitive.value
+            }
+            else {
+                result[JSONKey.type.rawValue] = 0
+            }
+        case .primitives(let primitives):
+            if primitives.count > 0 {
+                result[JSONKey.type.rawValue] = primitives.first!.type.rawValue
+                result[JSONKey.value.rawValue] = primitives.map { $0.value }
+            }
+            else {
+                result[JSONKey.type.rawValue] = 0
+            }
+        case .valueTreeReference(let ref):
+            result[JSONKey.referencedType.rawValue] = ref.storedType
+            result[JSONKey.referencedIdentifier.rawValue] = ref.uniqueIdentifier
+        case .optionalValueTreeReference(let ref):
+            if let ref = ref {
+                result[JSONKey.referencedType.rawValue] = ref.storedType
+                result[JSONKey.referencedIdentifier.rawValue] = ref.uniqueIdentifier
+            }
+            else {
+                result[JSONKey.referencedType.rawValue] = 0
+            }
+        case .valueTreeReferences(let refs):
+            if refs.count > 0 {
+                result[JSONKey.referencedType.rawValue] = refs.first!.storedType
+                result[JSONKey.referencedIdentifier.rawValue] = refs.map { $0.uniqueIdentifier }
+            }
+        }
+        return result as AnyObject
     }
     
 }
-*/
