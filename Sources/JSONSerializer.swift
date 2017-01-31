@@ -17,23 +17,25 @@ public enum JSONSerializationError: Error {
 
 
 protocol JSONRepresentable {
-    init(withJSONObject jsonObject: Any) throws
-    func JSONObject() -> Any
+    init(withJSONRepresentation json: Any) throws
+    func JSONRepresentation() -> Any
 }
 
 
-public class JSONSerializer: Serializer {
+public class JSONSerializer: RepositorySerializer {
+    
+    public init() {}
     
     public func load(from url:URL) throws -> [String:ValueTree] {
         let data = try Data(contentsOf: url)
         guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] else {
             throw JSONSerializationError.invalidFormat(reason: "JSON root was not a dictionary")
         }
-        return try dict.mapValues { try ValueTree(withJSONObject: $0) }
+        return try dict.mapValues { try ValueTree(withJSONRepresentation: $0) }
     }
     
     public func save(_ valueTreesByKey:[String:ValueTree], to url:URL) throws {
-        let json = valueTreesByKey.mapValues { $0.JSONObject() }
+        let json = valueTreesByKey.mapValues { $0.JSONRepresentation() }
         let data = try JSONSerialization.data(withJSONObject: json, options: [])
         try data.write(to: url)
     }
@@ -47,18 +49,21 @@ extension ValueTree: JSONRepresentable {
         case metadata, storedType, uniqueIdentifier, timestamp, isDeleted, version, propertiesByName
     }
     
-    public init(withJSONObject jsonObject: Any) throws {
-        guard let jsonObject = jsonObject as? [String:Any] else {
+    public init(withJSONRepresentation json: Any) throws {
+        guard let json = json as? [String:Any] else {
             throw JSONSerializationError.invalidFormat(reason: "No root dictionary in JSON")
         }
+        
         guard
-            let id = jsonObject[JSONKey.uniqueIdentifier.rawValue] as? String,
-            let storedType = jsonObject[JSONKey.storedType.rawValue] as? StoredType,
-            let timestamp = jsonObject[JSONKey.timestamp.rawValue] as? TimeInterval,
-            let isDeleted = jsonObject[JSONKey.isDeleted.rawValue] as? Bool,
-            let version = jsonObject[JSONKey.version.rawValue] as? StoredVersion else {
+            let metadataDict = json[JSONKey.metadata.rawValue] as? [String:Any],
+            let id = metadataDict[JSONKey.uniqueIdentifier.rawValue] as? String,
+            let storedType = metadataDict[JSONKey.storedType.rawValue] as? StoredType,
+            let timestamp = metadataDict[JSONKey.timestamp.rawValue] as? TimeInterval,
+            let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool,
+            let version = metadataDict[JSONKey.version.rawValue] as? StoredVersion else {
             throw JSONSerializationError.invalidMetadata
         }
+        
         var metadata = Metadata(uniqueIdentifier: id)
         metadata.timestamp = timestamp
         metadata.isDeleted = isDeleted
@@ -67,15 +72,15 @@ extension ValueTree: JSONRepresentable {
         self.storedType = storedType
         self.metadata = metadata
         
-        guard let propertiesByName = jsonObject[JSONKey.propertiesByName.rawValue] as? [String:Any] else {
+        guard let propertiesByName = json[JSONKey.propertiesByName.rawValue] as? [String:Any] else {
             throw JSONSerializationError.invalidFormat(reason: "No properties dictionary found for object")
         }
         self.propertiesByName = try propertiesByName.mapValues {
-            try Property(withJSONObject: $0 as AnyObject)
+            try Property(withJSONRepresentation: $0 as AnyObject)
         }
     }
     
-    public func JSONObject() -> Any {
+    public func JSONRepresentation() -> Any {
         var json = [String:Any]()
         let metadataDict: [String:Any] = [
             JSONKey.storedType.rawValue : storedType,
@@ -86,7 +91,7 @@ extension ValueTree: JSONRepresentable {
         ]
         json[JSONKey.metadata.rawValue] = metadataDict
         json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { property in
-            return property.JSONObject()
+            return property.JSONRepresentation()
         }
         return json
     }
@@ -100,22 +105,22 @@ extension Property: JSONRepresentable {
         case propertyType, primitiveType, value, referencedType, referencedIdentifier, referencedIdentifiers
     }
     
-    public init(withJSONObject jsonObject: Any) throws {
+    public init(withJSONRepresentation json: Any) throws {
         guard
-            let jsonObject = jsonObject as? [String:Any],
-            let propertyTypeInt = jsonObject[JSONKey.propertyType.rawValue] as? Int,
+            let json = json as? [String:Any],
+            let propertyTypeInt = json[JSONKey.propertyType.rawValue] as? Int,
             let propertyType = PropertyType(rawValue: propertyTypeInt) else {
             throw JSONSerializationError.invalidProperty(reason: "No valid property type")
         }
 
-        let primitiveTypeInt = jsonObject[JSONKey.primitiveType.rawValue] as? Int
+        let primitiveTypeInt = json[JSONKey.primitiveType.rawValue] as? Int
         let primitiveType = primitiveTypeInt != nil ? PrimitiveType(rawValue: primitiveTypeInt!) : nil
 
         switch propertyType {
         case .primitive:
             guard
                 let primitiveType = primitiveType,
-                let value = jsonObject[JSONKey.value.rawValue] else {
+                let value = json[JSONKey.value.rawValue] else {
                 throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
             }
             self = try Property(withPrimitiveType: primitiveType, value: value)
@@ -127,7 +132,7 @@ extension Property: JSONRepresentable {
             else {
                 guard
                     let primitiveType = primitiveType,
-                    let value = jsonObject[JSONKey.value.rawValue] else {
+                    let value = json[JSONKey.value.rawValue] else {
                     throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
                 }
                 self = try Property(withPrimitiveType: primitiveType, value: value)
@@ -140,7 +145,7 @@ extension Property: JSONRepresentable {
             else {
                 guard
                     let primitiveType = primitiveType,
-                    let value = jsonObject[JSONKey.value.rawValue] as? [Any] else {
+                    let value = json[JSONKey.value.rawValue] as? [Any] else {
                     throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
                 }
                 switch primitiveType {
@@ -162,22 +167,22 @@ extension Property: JSONRepresentable {
                 }
             }
         case .valueTreeReference:
-            self = try Property(withReferenceDictionary: jsonObject)
+            self = try Property(withReferenceDictionary: json)
         case .optionalValueTreeReference:
-            if let referencedType = jsonObject[JSONKey.referencedType.rawValue] as? Int, referencedType == 0 {
+            if let referencedType = json[JSONKey.referencedType.rawValue] as? Int, referencedType == 0 {
                 self = .optionalValueTreeReference(nil)
             }
             else {
-                self = try Property(withReferenceDictionary: jsonObject)
+                self = try Property(withReferenceDictionary: json)
             }
         case .valueTreeReferences:
-            if let referencedType = jsonObject[JSONKey.referencedType.rawValue] as? Int, referencedType == 0 {
+            if let referencedType = json[JSONKey.referencedType.rawValue] as? Int, referencedType == 0 {
                 self = .valueTreeReferences([])
             }
             else {
                 guard
-                    let referencedType = jsonObject[JSONKey.referencedType.rawValue] as? String,
-                    let referencedIdentifiers = jsonObject[JSONKey.referencedIdentifiers.rawValue] as? [String] else {
+                    let referencedType = json[JSONKey.referencedType.rawValue] as? String,
+                    let referencedIdentifiers = json[JSONKey.referencedIdentifiers.rawValue] as? [String] else {
                     throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
                 }
                 let refs = referencedIdentifiers.map { ValueTreeReference(uniqueIdentifier: $0, storedType: referencedType) }
@@ -216,7 +221,7 @@ extension Property: JSONRepresentable {
         self = .valueTreeReference(ref)
     }
     
-    public func JSONObject() -> Any {
+    public func JSONRepresentation() -> Any {
         var result = [String:Any]()
         result[JSONKey.propertyType.rawValue] = propertyType.rawValue
         

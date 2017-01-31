@@ -37,6 +37,7 @@
 		073CB7CD1E02F29200E567D7 /* ValueTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073CB7CC1E02F29200E567D7 /* ValueTreeBuilder.swift */; };
 		0772A0971E3A1703008E85C8 /* JSONSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772A0961E3A1703008E85C8 /* JSONSerializer.swift */; };
 		077C8B5F1E01A80B0073B628 /* StorablePrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077C8B5E1E01A80B0073B628 /* StorablePrimitive.swift */; };
+		07C5C2291E40F3F6009596F4 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5C2281E40F3F6009596F4 /* SerializationTests.swift */; };
 		07C769991E0469920063CB4A /* ValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C769981E0469920063CB4A /* ValueTree.swift */; };
 /* End PBXBuildFile section */
 
@@ -108,6 +109,7 @@
 		0744C5DC1E26B8A7005799E6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0772A0961E3A1703008E85C8 /* JSONSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONSerializer.swift; sourceTree = "<group>"; };
 		077C8B5E1E01A80B0073B628 /* StorablePrimitive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorablePrimitive.swift; sourceTree = "<group>"; };
+		07C5C2281E40F3F6009596F4 /* SerializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		07C769981E0469920063CB4A /* ValueTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTree.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -265,6 +267,7 @@
 				0707B4311DF9DE0F00FE8F40 /* Child.swift */,
 				0737AAF21DF9524E00ABBA90 /* BasicTests.swift */,
 				072576231E128F680086D1D5 /* ExchangeTests.swift */,
+				07C5C2281E40F3F6009596F4 /* SerializationTests.swift */,
 				0737AAF41DF9524E00ABBA90 /* Info.plist */,
 			);
 			name = "Impeller Tests";
@@ -520,6 +523,7 @@
 				0737AAF31DF9524E00ABBA90 /* BasicTests.swift in Sources */,
 				072576241E128F680086D1D5 /* ExchangeTests.swift in Sources */,
 				0707B4321DF9DE0F00FE8F40 /* Child.swift in Sources */,
+				07C5C2291E40F3F6009596F4 /* SerializationTests.swift in Sources */,
 				0707B4301DF9DDC300FE8F40 /* Parent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

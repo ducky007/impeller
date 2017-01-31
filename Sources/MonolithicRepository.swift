@@ -28,7 +28,7 @@ fileprivate struct TimestampCursor: Cursor {
 }
 
 
-public protocol Serializer {
+public protocol RepositorySerializer {
     func load(from url:URL) throws -> [String:ValueTree]
     func save(_ valueTreesByKey:[String:ValueTree], to url:URL) throws
 }
@@ -370,11 +370,11 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         }
     }
     
-    public func load(from url:URL, with serializer: Serializer) throws {
+    public func load(from url:URL, with serializer: RepositorySerializer) throws {
         try valueTreesByKey = serializer.load(from:url)
     }
     
-    public func save(to url:URL, with serializer: Serializer) throws {
+    public func save(to url:URL, with serializer: RepositorySerializer) throws {
         try serializer.save(valueTreesByKey, to:url)
     }
 }

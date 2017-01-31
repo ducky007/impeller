@@ -14,6 +14,7 @@ class BasicTests: XCTestCase {
     var repository: MonolithicRepository!
     
     override func setUp() {
+        super.setUp()
         repository = MonolithicRepository()
     }
     
