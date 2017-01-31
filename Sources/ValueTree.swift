@@ -24,7 +24,7 @@ public struct ValueTree: Equatable, Hashable {
     public var metadata: Metadata
     public var storedType: StoredType
     
-    public private(set) var propertiesByName = [String:Property]()
+    public internal(set) var propertiesByName = [String:Property]()
     
     public var valueTreeReference: ValueTreeReference {
         return ValueTreeReference(uniqueIdentifier: metadata.uniqueIdentifier, storedType: storedType)

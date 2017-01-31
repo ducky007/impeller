@@ -53,10 +53,10 @@ extension Dictionary {
         return result
     }
     
-    func mapValues<T>(transform:(Value)->T) -> Dictionary<Key, T> {
+    func mapValues<T>(transform: (Value) throws ->T) rethrows -> Dictionary<Key, T> {
         var d = Dictionary<Key,T>()
         for (key, value) in self {
-            d[key] = transform(value)
+            d[key] = try transform(value)
         }
         return d
     }
@@ -64,10 +64,10 @@ extension Dictionary {
 
 
 extension Array {
-    func elementsByKey<KeyType:Hashable>(generatingKeysWith keyGeneratingBlock:(Element)->KeyType) -> [KeyType:Element] {
+    func elementsByKey<KeyType:Hashable>(generatingKeysWith keyGeneratingBlock:(Element) throws ->KeyType) rethrows -> [KeyType:Element] {
         var result = [KeyType:Element]()
         for element in self {
-            let key = keyGeneratingBlock(element)
+            let key = try keyGeneratingBlock(element)
             result[key] = element
         }
         return result
