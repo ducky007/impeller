@@ -244,7 +244,7 @@ extension CKRecord {
         metadata.timestamp = timestamp
         metadata.isDeleted = isDeleted
         
-        let valueTree = ValueTree(storedType: recordType, metadata: metadata)
+        var valueTree = ValueTree(storedType: recordType, metadata: metadata)
         for key in allKeys() {
             if key.contains("__metadata__") { continue }
             

@@ -9,6 +9,8 @@
 import Foundation
 
 
+/*
+
 protocol JSONRepresentable {
     init(withJSONObject jsonObject: AnyObject) throws
     func JSONObject() -> AnyObject
@@ -36,7 +38,7 @@ extension ValueTree: JSONRepresentable {
         case metadata, storedType, uniqueIdentifier, timestamp, isDeleted, version, propertiesByName
     }
     
-    public required init(withJSONObject jsonObject: AnyObject) throws {
+    public init(withJSONObject jsonObject: AnyObject) throws {
         
     }
     
@@ -50,7 +52,7 @@ extension ValueTree: JSONRepresentable {
             JSONKey.version.rawValue : metadata.version]
         json[JSONKey.metadata.rawValue] = metadataDict
         json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { property in
-            return property.asJSONObject()
+            // return property.asJSONObject()
         }
         return json as AnyObject
     }
@@ -59,9 +61,9 @@ extension ValueTree: JSONRepresentable {
   /*
     private var propertiesByName = [String:Property]() */
     
-}
+}*/
 
-
+/*
 extension Property: JSONRepresentable {
     
     public init(withJSONObject jsonObject: AnyObject) throws {
@@ -73,3 +75,4 @@ extension Property: JSONRepresentable {
     }
     
 }
+*/

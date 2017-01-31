@@ -56,7 +56,12 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     private var currentValueTree: ValueTree? {
-        return valueTreesByKey[currentValueTreeKey]
+        get {
+            return valueTreesByKey[currentValueTreeKey]
+        }
+        set {
+            valueTreesByKey[currentValueTreeKey] = newValue
+        }
     }
     
     private func currentTreeProperty(_ key: String) -> Property? {

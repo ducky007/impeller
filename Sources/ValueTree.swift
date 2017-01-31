@@ -20,7 +20,7 @@ public struct ValueTreeReference: Equatable, Hashable {
 }
 
 
-public final class ValueTree: Equatable, Hashable {
+public struct ValueTree: Equatable, Hashable {
     public var metadata: Metadata
     public var storedType: StoredType
     
@@ -39,17 +39,11 @@ public final class ValueTree: Equatable, Hashable {
         self.metadata = metadata
     }
     
-    public init(deepCopying other:ValueTree) {
-        metadata = other.metadata
-        storedType = other.storedType
-        propertiesByName = other.propertiesByName
-    }
-    
     public func get(_ propertyName: String) -> Property? {
         return propertiesByName[propertyName]
     }
     
-    public func set(_ propertyName: String, to property: Property) {
+    public mutating func set(_ propertyName: String, to property: Property) {
         propertiesByName[propertyName] = property
     }
     
@@ -63,16 +57,16 @@ public final class ValueTree: Equatable, Hashable {
     
     func merged(with other: ValueTree?) -> ValueTree {
         guard let other = other, self != other else {
-            return ValueTree(deepCopying: self)
+            return self
         }
         
         var mergedTree: ValueTree!
         if metadata.timestamp < other.metadata.timestamp {
-            mergedTree = ValueTree(deepCopying: other)
+            mergedTree = other
             mergedTree.metadata.version = max(other.metadata.version, metadata.version+1)
         }
         else {
-            mergedTree = ValueTree(deepCopying: self)
+            mergedTree = self
             mergedTree.metadata.version = max(metadata.version, other.metadata.version+1)
         }
         
