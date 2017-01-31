@@ -12,7 +12,7 @@ import Impeller
 class SerializationTests: XCTestCase {
     
     var repository: MonolithicRepository!
-    var serializer: JSONSerializer!
+    var serializer: JSONRepositorySerializer!
     let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent("SerializationTests")
     var storeURL: URL!
     
@@ -21,7 +21,7 @@ class SerializationTests: XCTestCase {
         try? FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: false, attributes: nil)
         storeURL = dirURL.appendingPathComponent("store.db")
         repository = MonolithicRepository()
-        serializer = JSONSerializer()
+        serializer = JSONRepositorySerializer()
     }
     
     override func tearDown() {

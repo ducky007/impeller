@@ -16,13 +16,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var tasksViewController: TasksViewController!
     
+    var storeURL: URL {
+        let documentsDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        return documentsDir.appendingPathComponent("Listless.json")
+    }
+    
     let localRepository = MonolithicRepository()
+    let serializer = JSONRepositorySerializer()
     let cloudRepository = CloudKitRepository(withUniqueIdentifier: "Main", cloudDatabase: CKContainer.default().privateCloudDatabase)
     lazy var exchange: Exchange = { Exchange(coupling: [self.localRepository, self.cloudRepository], pathForSavedState: nil) }()
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
+        if FileManager.default.fileExists(atPath: storeURL.path) {
+            try? localRepository.load(from: storeURL, with: serializer)
+        }
+        
         let navController = window!.rootViewController as! UINavigationController
         tasksViewController = navController.topViewController as! TasksViewController
+        
+        updateTaskList()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -32,8 +44,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
         sync { error in
+            try? self.localRepository.save(to: self.storeURL, with: self.serializer)
             UIApplication.shared.endBackgroundTask(backgroundTask)
         }
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        try? localRepository.save(to: storeURL, with: serializer)
     }
     
     @IBAction func sync(_ sender: Any?) {
