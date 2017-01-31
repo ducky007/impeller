@@ -24,7 +24,7 @@ public struct CloudKitCursor: Cursor {
 }
 
 
-@available (macOS 10.12, *)
+@available (macOS 10.12, iOS 10, *)
 public class CloudKitRepository: Exchangable {
     
     public let uniqueIdentifier: UniqueIdentifier

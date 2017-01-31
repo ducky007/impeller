@@ -36,7 +36,7 @@ extension ValueTree: JSONRepresentable {
         case metadata, storedType, uniqueIdentifier, timestamp, isDeleted, version, propertiesByName
     }
     
-    public init(withJSONObject jsonObject: AnyObject) throws {
+    public required init(withJSONObject jsonObject: AnyObject) throws {
         
     }
     
@@ -64,11 +64,11 @@ extension ValueTree: JSONRepresentable {
 
 extension Property: JSONRepresentable {
     
-    init(withJSONObject jsonObject: AnyObject) throws {
+    public init(withJSONObject jsonObject: AnyObject) throws {
         
     }
     
-    func asJSONObject() -> AnyObject {
+    public func asJSONObject() -> AnyObject {
         
     }
     
