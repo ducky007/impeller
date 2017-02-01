@@ -1,7 +1,10 @@
 ![Impeller: A Distributed Value Store in Swift](https://cloud.githubusercontent.com/assets/77312/22173713/77d11400-dfcb-11e6-8790-3d39359ed0d7.png)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Swift Version](https://img.shields.io/badge/Swift-3.0-orange.svg)
+[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Plaforms](https://img.shields.io/badge/Platforms-Linux%20%7C%20macOS%20%7C%20iOS%20%7C%20WatichOS%20%7C%20tvOS-lightgrey.svg)
 
 Impeller is a Distributed Value Store (DVS) written in Swift. It was inspired by successful Distributed Version Control Systems (DVCSes) like Git and Mercurial, and appropriates the concept and terminology for use with application data, rather than source code files.
 
