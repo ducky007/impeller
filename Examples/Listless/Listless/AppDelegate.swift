@@ -12,6 +12,10 @@ import CloudKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    override class func initialize() {
+        Log.level = .verbose
+    }
 
     var window: UIWindow?
     var tasksViewController: TasksViewController!

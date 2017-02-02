@@ -37,6 +37,7 @@
 		073CB7CD1E02F29200E567D7 /* ValueTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073CB7CC1E02F29200E567D7 /* ValueTreeBuilder.swift */; };
 		0772A0971E3A1703008E85C8 /* JSONSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772A0961E3A1703008E85C8 /* JSONSerializer.swift */; };
 		077C8B5F1E01A80B0073B628 /* StorablePrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077C8B5E1E01A80B0073B628 /* StorablePrimitive.swift */; };
+		077F2A011E43C6BE00A1FF59 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077F2A001E43C6BE00A1FF59 /* Log.swift */; };
 		07C5C2291E40F3F6009596F4 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5C2281E40F3F6009596F4 /* SerializationTests.swift */; };
 		07C769991E0469920063CB4A /* ValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C769981E0469920063CB4A /* ValueTree.swift */; };
 /* End PBXBuildFile section */
@@ -109,6 +110,7 @@
 		0744C5DC1E26B8A7005799E6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0772A0961E3A1703008E85C8 /* JSONSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONSerializer.swift; sourceTree = "<group>"; };
 		077C8B5E1E01A80B0073B628 /* StorablePrimitive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorablePrimitive.swift; sourceTree = "<group>"; };
+		077F2A001E43C6BE00A1FF59 /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		07C5C2281E40F3F6009596F4 /* SerializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		07C769981E0469920063CB4A /* ValueTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTree.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -248,6 +250,7 @@
 			children = (
 				0737AAE71DF9524D00ABBA90 /* Impeller.h */,
 				0737AB061DF9534300ABBA90 /* General.swift */,
+				077F2A001E43C6BE00A1FF59 /* Log.swift */,
 				071B35C11E16EA5600781F99 /* Storables */,
 				071B35C01E16EA3B00781F99 /* Value Trees */,
 				071B35C21E16EA7C00781F99 /* Local Repositories */,
@@ -507,6 +510,7 @@
 				0772A0971E3A1703008E85C8 /* JSONSerializer.swift in Sources */,
 				0737AB051DF9530C00ABBA90 /* MonolithicRepository.swift in Sources */,
 				073CB7CD1E02F29200E567D7 /* ValueTreeBuilder.swift in Sources */,
+				077F2A011E43C6BE00A1FF59 /* Log.swift in Sources */,
 				071B35BF1E16E78300781F99 /* Primitive.swift in Sources */,
 				0737AB011DF952C000ABBA90 /* LocalRepository.swift in Sources */,
 				07C769991E0469920063CB4A /* ValueTree.swift in Sources */,
