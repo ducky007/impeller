@@ -27,6 +27,7 @@ public protocol Exchangable: class {
 public class Exchange {
     public let exchangables: [Exchangable]
     public let pathForSavedState: String?
+    private let queue = DispatchQueue(label: "impeller.exchange")
     private var cursorsByExchangableIdentifier: [UniqueIdentifier:Cursor]
     
     public init(coupling exchangables: [Exchangable], pathForSavedState: String?) {
@@ -45,58 +46,49 @@ public class Exchange {
     }
     
     public func exchange(completionHandler completion:CompletionHandler?) {
-        let group = DispatchGroup()
-        
-        // Join group for each exchangable in outer loop. 
-        // Avoid race conditions by doing this before starting loop.
-        for e1 in exchangables { group.enter() }
-        
-        // When group is complete, call completion
         var returnError: Error?
-        group.notify(queue: DispatchQueue.main) { [unowned self] in
-            completion?(returnError)
-        }
+        let group = DispatchGroup()
         
         for e1 in exchangables {
             let uniqueIdentifier = e1.uniqueIdentifier
             let c1 = cursor(forExchangableIdentifiedBy: uniqueIdentifier)
-            e1.push(changesSince: c1) {
-                error, dictionaries, newCursor in
+            
+            for e2 in self.exchangables {
+                guard e1 !== e2 else { continue }
                 
-                guard returnError == nil else {
-                    group.leave()
-                    return
-                }
-                guard error == nil else {
-                    returnError = error
-                    group.leave()
-                    return
-                }
-                
-                // Join groups for each other exchangable.
-                let pullGroup = DispatchGroup()
-                for e2 in self.exchangables {
-                    guard e1 !== e2 else { continue }
-                    pullGroup.enter()
-                }
-                
-                // Save cursor if all repositories successfully assimilate data
-                pullGroup.notify(queue: DispatchQueue.main) {
-                    defer { group.leave() }
-                    guard returnError == nil else { return }
-                    self.commit(newCursor, forExchangableIdentifiedBy: uniqueIdentifier)
-                }
-                
-                for e2 in self.exchangables {
-                    guard e1 !== e2 else { continue }
-                    e2.pull(dictionaries) {
-                        error in
-                        defer { pullGroup.leave() }
+                group.enter()
+                queue.async {
+                    e1.push(changesSince: c1) {
+                        error, dictionaries, newCursor in
+                        
                         guard returnError == nil else { return }
                         guard error == nil else { returnError = error; return }
+                        
+                        for e2 in self.exchangables {
+                            guard e1 !== e2 else { continue }
+                            group.enter()
+                            self.queue.async {
+                                e2.pull(dictionaries) {
+                                    error in
+                                    defer { group.leave() }
+                                    guard returnError == nil else { return }
+                                    guard error == nil else { returnError = error; return }
+                                }
+                            }
+                        }
+                        
+                        self.queue.async {
+                            defer { group.leave() }
+                            guard returnError == nil else { return }
+                            self.commit(newCursor, forExchangableIdentifiedBy: uniqueIdentifier)
+                        }
                     }
                 }
             }
+        }
+        
+        group.notify(queue: DispatchQueue.main) {
+            completion?(returnError)
         }
     }
 }

@@ -38,6 +38,7 @@ public protocol RepositorySerializer {
 /// but other classes can be used to do that.
 public class MonolithicRepository: LocalRepository, Exchangable {
     public var uniqueIdentifier: UniqueIdentifier = uuid()
+    private let queue = DispatchQueue(label: "impeller.monolithicRepository")
     private var valueTreesByKey = [String:ValueTree]()
     private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", storedType: "")
     private var identifiersOfUnchanged = Set<UniqueIdentifier>()
@@ -66,6 +67,74 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     
     private func currentTreeProperty(_ key: String) -> Property? {
         return valueTreesByKey[currentValueTreeKey]?.get(key)
+    }
+    
+    public func load(from url:URL, with serializer: RepositorySerializer) throws {
+        try queue.sync {
+            try valueTreesByKey = serializer.load(from:url)
+        }
+    }
+    
+    public func save(to url:URL, with serializer: RepositorySerializer) throws {
+        try queue.sync {
+            try serializer.save(valueTreesByKey, to:url)
+        }
+    }
+    
+    /// Resolves conflicts and commits, and sets the value on out to resolved value.
+    public func commit<T:Storable>(_ value: inout T, context: Any? = nil) {
+        queue.sync {
+            prepareToMakeChanges(forRoot: value)
+            commitContext = context
+            writeValueAndDescendants(of: &value)
+        }
+    }
+    
+    public func delete<T:Storable>(_ value: inout T) {
+        queue.sync {
+            prepareToMakeChanges(forRoot: value)
+            isDeletionPass = true
+            writeValueAndDescendants(of: &value)
+        }
+    }
+    
+    public func fetchValue<T:Storable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T? {
+        var result: T?
+        queue.sync {
+            result = storableValue(identifiedBy: uniqueIdentifier)
+        }
+        return result
+    }
+    
+    public func push(changesSince cursor: Cursor?, completionHandler completion: @escaping (Error?, [ValueTree], Cursor?)->Void) {
+        queue.async {
+            let timestampCursor = cursor as? TimestampCursor
+            var maximumTimestamp = timestampCursor?.timestamp ?? Date.distantPast.timeIntervalSinceReferenceDate
+            var valueTrees = [ValueTree]()
+            for (_, valueTree) in self.valueTreesByKey {
+                let time = valueTree.metadata.timestamp
+                if timestampCursor == nil || timestampCursor!.timestamp <= time {
+                    valueTrees.append(valueTree)
+                    maximumTimestamp = max(maximumTimestamp, time)
+                }
+            }
+            DispatchQueue.main.async {
+                completion(nil, valueTrees, TimestampCursor(timestamp: maximumTimestamp))
+            }
+        }
+    }
+    
+    public func pull(_ valueTrees: [ValueTree], completionHandler completion: @escaping CompletionHandler) {
+        queue.async {
+            for newTree in valueTrees {
+                let reference = ValueTreeReference(uniqueIdentifier: newTree.metadata.uniqueIdentifier, storedType: newTree.storedType)
+                let key = MonolithicRepository.key(for: reference)
+                self.valueTreesByKey[key] = newTree.merged(with: self.valueTreesByKey[key])
+            }
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+        }
     }
     
     public func read<T:StorablePrimitive>(_ key:String) -> T? {
@@ -106,7 +175,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     public func read<T:Storable>(_ key:String) -> T? {
         if  let property = currentTreeProperty(key),
             let reference = property.asValueTreeReference() {
-            return fetchValue(identifiedBy: reference.uniqueIdentifier)
+            return storableValue(identifiedBy: reference.uniqueIdentifier)
         }
         else {
             return nil
@@ -117,7 +186,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         if  let property = currentTreeProperty(key),
             let optionalReference = property.asOptionalValueTreeReference(),
             let reference = optionalReference {
-            return fetchValue(identifiedBy: reference.uniqueIdentifier)
+            return storableValue(identifiedBy: reference.uniqueIdentifier)
         }
         else {
             return nil
@@ -127,7 +196,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     public func read<T:Storable>(_ key:String) -> [T]? {
         if  let property = currentTreeProperty(key),
             let references = property.asValueTreeReferences() {
-            return references.map { fetchValue(identifiedBy: $0.uniqueIdentifier)! }
+            return references.map { storableValue(identifiedBy: $0.uniqueIdentifier)! }
         }
         else {
             return nil
@@ -160,7 +229,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         
         // Fetch existing store value of descendant, and delete (if it differs from new reference)
         if let oldReference = valueTreesByKey[currentValueTreeKey]!.get(key)?.asValueTreeReference(), reference != oldReference {
-            var oldValue: T = fetchValue(identifiedBy: oldReference.uniqueIdentifier)!
+            var oldValue: T = storableValue(identifiedBy: oldReference.uniqueIdentifier)!
             transaction {
                 isDeletionPass = true
                 currentTreeReference = oldReference
@@ -189,7 +258,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         if  let oldOptionalReference = valueTreesByKey[currentValueTreeKey]!.get(key)?.asOptionalValueTreeReference(),
             let oldReference = oldOptionalReference,
             oldOptionalReference != reference {
-            var oldValue: T = fetchValue(identifiedBy: oldReference.uniqueIdentifier)!
+            var oldValue: T = storableValue(identifiedBy: oldReference.uniqueIdentifier)!
             transaction {
                 isDeletionPass = true
                 currentTreeReference = oldReference
@@ -220,7 +289,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         if let oldReferences = valueTreesByKey[currentValueTreeKey]!.get(key)?.asValueTreeReferences() {
             let orphanedReferences = Set(oldReferences).subtracting(Set(references))
             for orphanedReference in orphanedReferences {
-                var orphanedValue: T = fetchValue(identifiedBy: orphanedReference.uniqueIdentifier)!
+                var orphanedValue: T = storableValue(identifiedBy: orphanedReference.uniqueIdentifier)!
                 transaction {
                     isDeletionPass = true
                     currentTreeReference = orphanedReference
@@ -253,21 +322,8 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         commitContext = nil
     }
     
-    /// Resolves conflicts and commits, and sets the value on out to resolved value.
-    public func commit<T:Storable>(_ value: inout T, context: Any? = nil) {
-        prepareToMakeChanges(forRoot: value)
-        commitContext = context
-        writeValueAndDescendants(of: &value)
-    }
-    
-    public func delete<T:Storable>(_ value: inout T) {
-        prepareToMakeChanges(forRoot: value)
-        isDeletionPass = true
-        writeValueAndDescendants(of: &value)
-    }
-    
     private func writeValueAndDescendants<T:Storable>(of value: inout T) {
-        let storeValue:T? = fetchValue(identifiedBy: value.metadata.uniqueIdentifier)
+        let storeValue:T? = storableValue(identifiedBy: value.metadata.uniqueIdentifier)
         if storeValue == nil {
             valueTreesByKey[currentValueTreeKey] = ValueTree(storedType: T.storedType, metadata: value.metadata)
         }
@@ -321,7 +377,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         value = resolvedValue
     }
     
-    public func fetchValue<T:Storable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T? {
+    private func storableValue<T:Storable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T? {
         var result: T?
         transaction {
             currentTreeReference = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, storedType: T.storedType)
@@ -341,41 +397,6 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         block()
         isDeletionPass = isDeletion
         currentTreeReference = storedReference
-    }
-
-    public func push(changesSince cursor: Cursor?, completionHandler completion: @escaping (Error?, [ValueTree], Cursor?)->Void) {
-        let timestampCursor = cursor as? TimestampCursor
-        var maximumTimestamp = timestampCursor?.timestamp ?? Date.distantPast.timeIntervalSinceReferenceDate
-        var valueTrees = [ValueTree]()
-        for (_, valueTree) in valueTreesByKey {
-            let time = valueTree.metadata.timestamp
-            if timestampCursor == nil || timestampCursor!.timestamp <= time {
-                valueTrees.append(valueTree)
-                maximumTimestamp = max(maximumTimestamp, time)
-            }
-        }
-        DispatchQueue.main.async {
-            completion(nil, valueTrees, TimestampCursor(timestamp: maximumTimestamp))
-        }
-    }
-    
-    public func pull(_ valueTrees: [ValueTree], completionHandler completion: @escaping CompletionHandler) {
-        for newTree in valueTrees {
-            let reference = ValueTreeReference(uniqueIdentifier: newTree.metadata.uniqueIdentifier, storedType: newTree.storedType)
-            let key = MonolithicRepository.key(for: reference)
-            valueTreesByKey[key] = newTree.merged(with: valueTreesByKey[key])
-        }
-        DispatchQueue.main.async {
-            completion(nil)
-        }
-    }
-    
-    public func load(from url:URL, with serializer: RepositorySerializer) throws {
-        try valueTreesByKey = serializer.load(from:url)
-    }
-    
-    public func save(to url:URL, with serializer: RepositorySerializer) throws {
-        try serializer.save(valueTreesByKey, to:url)
     }
 }
 
