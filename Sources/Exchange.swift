@@ -10,7 +10,7 @@ import Foundation
 
 
 public protocol Cursor {
-    var data: Data { get set }
+    var data: Data { get }
 }
 
 
@@ -21,6 +21,7 @@ public protocol Exchangable: class {
     func push(changesSince cursor: Cursor?, completionHandler completion: @escaping (Error?, [ValueTree], Cursor?)->Void)
     func pull(_ ValueTrees: [ValueTree], completionHandler completion: @escaping CompletionHandler)
     
+    func makeCursor(fromData data: Data) -> Cursor?
 }
 
 
@@ -88,5 +89,26 @@ public class Exchange {
         group.notify(queue: DispatchQueue.main) {
             completion?(returnError)
         }
+    }
+    
+    func save() {
+        guard let pathForSavedState = pathForSavedState else { return }
+        let cursorDataByIdentifier = cursorsByExchangableIdentifier.mapValues { $1.data } as NSDictionary
+        cursorDataByIdentifier.write(toFile: pathForSavedState, atomically: true)
+    }
+    
+    func load() {
+        guard let pathForSavedState = pathForSavedState else { return }
+        guard let cursorDataByIdentifier = NSDictionary(contentsOfFile: pathForSavedState) as? [String:Data] else { return }
+        
+        var newCursors = [UniqueIdentifier:Cursor]()
+        for (id, data) in cursorDataByIdentifier {
+            if  let exchangable = exchangables.filter({ $0.uniqueIdentifier == id }).first,
+                let cursor = exchangable.makeCursor(fromData: data) {
+                newCursors[id] = cursor
+            }
+        }
+        
+        cursorsByExchangableIdentifier = newCursors
     }
 }

@@ -31,11 +31,11 @@ public class JSONRepositorySerializer: RepositorySerializer {
         guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] else {
             throw JSONSerializationError.invalidFormat(reason: "JSON root was not a dictionary")
         }
-        return try dict.mapValues { try ValueTree(withJSONRepresentation: $0) }
+        return try dict.mapValues { try ValueTree(withJSONRepresentation: $1) }
     }
     
     public func save(_ valueTreesByKey:[String:ValueTree], to url:URL) throws {
-        let json = valueTreesByKey.mapValues { $0.JSONRepresentation() }
+        let json = valueTreesByKey.mapValues { $1.JSONRepresentation() }
         let data = try JSONSerialization.data(withJSONObject: json, options: [])
         try data.write(to: url)
     }
@@ -76,7 +76,7 @@ extension ValueTree: JSONRepresentable {
             throw JSONSerializationError.invalidFormat(reason: "No properties dictionary found for object")
         }
         self.propertiesByName = try propertiesByName.mapValues {
-            try Property(withJSONRepresentation: $0 as AnyObject)
+            try Property(withJSONRepresentation: $1 as AnyObject)
         }
     }
     
@@ -90,7 +90,7 @@ extension ValueTree: JSONRepresentable {
             JSONKey.version.rawValue : metadata.version
         ]
         json[JSONKey.metadata.rawValue] = metadataDict
-        json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { property in
+        json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { _, property in
             return property.JSONRepresentation()
         }
         return json

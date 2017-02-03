@@ -12,18 +12,17 @@ import Foundation
 fileprivate struct TimestampCursor: Cursor {
     private (set) var timestamp: TimeInterval
     
-    var data: Data {
-        get {
-            var t = timestamp
-            return Data(buffer: UnsafeBufferPointer(start: &t, count: 1))
-        }
-        set {
-            timestamp = data.withUnsafeBytes { $0.pointee }
-        }
-    }
-    
     init(timestamp: TimeInterval) {
         self.timestamp = timestamp
+    }
+    
+    init?(data: Data) {
+        timestamp = data.withUnsafeBytes { $0.pointee }
+    }
+    
+    var data: Data {
+        var t = timestamp
+        return Data(buffer: UnsafeBufferPointer(start: &t, count: 1))
     }
 }
 
@@ -135,6 +134,10 @@ public class MonolithicRepository: LocalRepository, Exchangable {
                 completion(nil)
             }
         }
+    }
+    
+    public func makeCursor(fromData data: Data) -> Cursor? {
+        return TimestampCursor(data: data)
     }
     
     public func read<T:StorablePrimitive>(_ key:String) -> T? {

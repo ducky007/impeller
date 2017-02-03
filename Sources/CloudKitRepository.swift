@@ -13,13 +13,21 @@ import CloudKit
 public struct CloudKitCursor: Cursor {
     var serverToken: CKServerChangeToken
     
+    init(serverToken: CKServerChangeToken) {
+        self.serverToken = serverToken
+    }
+    
+    init?(data: Data) {
+        if let newToken = NSKeyedUnarchiver.unarchiveObject(with: data) as? CKServerChangeToken {
+            serverToken = newToken
+        }
+        else {
+            return nil
+        }
+    }
+    
     public var data: Data {
-        get {
-            return NSKeyedArchiver.archivedData(withRootObject: serverToken)
-        }
-        set {
-            serverToken = NSKeyedUnarchiver.unarchiveObject(with: newValue) as! CKServerChangeToken
-        }
+        return NSKeyedArchiver.archivedData(withRootObject: serverToken)
     }
 }
 
@@ -129,6 +137,10 @@ public class CloudKitRepository: Exchangable {
         }
         
         database.add(fetchOperation)
+    }
+    
+    public func makeCursor(fromData data: Data) -> Cursor? {
+        return CloudKitCursor(data: data)
     }
 }
 

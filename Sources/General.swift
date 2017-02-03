@@ -53,10 +53,10 @@ extension Dictionary {
         return result
     }
     
-    func mapValues<T>(transform: (Value) throws ->T) rethrows -> Dictionary<Key, T> {
+    func mapValues<T>(transform: (Key, Value) throws -> T) rethrows -> Dictionary<Key, T> {
         var d = Dictionary<Key,T>()
         for (key, value) in self {
-            d[key] = try transform(value)
+            d[key] = try transform(key, value)
         }
         return d
     }
