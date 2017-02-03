@@ -52,35 +52,33 @@ public class Exchange {
         for e1 in exchangables {
             let uniqueIdentifier = e1.uniqueIdentifier
             let c1 = cursor(forExchangableIdentifiedBy: uniqueIdentifier)
-            
-            for e2 in self.exchangables {
-                guard e1 !== e2 else { continue }
-                
-                group.enter()
-                queue.async {
-                    e1.push(changesSince: c1) {
-                        error, dictionaries, newCursor in
-                        
-                        guard returnError == nil else { return }
-                        guard error == nil else { returnError = error; return }
-                        
-                        for e2 in self.exchangables {
-                            guard e1 !== e2 else { continue }
-                            group.enter()
-                            self.queue.async {
-                                e2.pull(dictionaries) {
-                                    error in
-                                    defer { group.leave() }
-                                    guard returnError == nil else { return }
-                                    guard error == nil else { returnError = error; return }
-                                }
-                            }
-                        }
-                        
+
+            group.enter()
+            queue.async {
+                e1.push(changesSince: c1) {
+                    error, dictionaries, newCursor in
+                    
+                    defer {
                         self.queue.async {
                             defer { group.leave() }
                             guard returnError == nil else { return }
                             self.commit(newCursor, forExchangableIdentifiedBy: uniqueIdentifier)
+                        }
+                    }
+                    
+                    guard returnError == nil else { return }
+                    guard error == nil else { returnError = error; return }
+                    
+                    for e2 in self.exchangables {
+                        guard e1 !== e2 else { continue }
+                        group.enter()
+                        self.queue.async {
+                            e2.pull(dictionaries) {
+                                error in
+                                defer { group.leave() }
+                                guard returnError == nil else { return }
+                                guard error == nil else { returnError = error; return }
+                            }
                         }
                     }
                 }
