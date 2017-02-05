@@ -22,7 +22,7 @@ protocol JSONRepresentable {
 }
 
 
-public class JSONRepositorySerializer: RepositorySerializer {
+public class JSONForestSerializer: ForestSerializer {
     
     public init() {}
     

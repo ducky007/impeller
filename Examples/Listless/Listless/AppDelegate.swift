@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     let localRepository = MonolithicRepository()
-    let serializer = JSONRepositorySerializer()
+    let serializer = JSONForestSerializer()
     let cloudRepository = CloudKitRepository(withUniqueIdentifier: "Main", cloudDatabase: CKContainer.default().privateCloudDatabase)
     lazy var exchange: Exchange = { Exchange(coupling: [self.localRepository, self.cloudRepository], pathForSavedState: nil) }()
     

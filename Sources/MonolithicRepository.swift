@@ -9,35 +9,13 @@
 import Foundation
 
 
-fileprivate struct TimestampCursor: Cursor {
-    private (set) var timestamp: TimeInterval
-    
-    init(timestamp: TimeInterval) {
-        self.timestamp = timestamp
-    }
-    
-    init?(data: Data) {
-        timestamp = data.withUnsafeBytes { $0.pointee }
-    }
-    
-    var data: Data {
-        var t = timestamp
-        return Data(buffer: UnsafeBufferPointer(start: &t, count: 1))
-    }
-}
-
-
-public protocol RepositorySerializer {
-    func load(from url:URL) throws -> [String:ValueTree]
-    func save(_ valueTreesByKey:[String:ValueTree], to url:URL) throws
-}
-
-
 /// All data is in memory. This class does not persist data to disk,
 /// but other classes can be used to do that.
 public class MonolithicRepository: LocalRepository, Exchangable {
     public var uniqueIdentifier: UniqueIdentifier = uuid()
     private let queue = DispatchQueue(label: "impeller.monolithicRepository")
+    private var forest: Forest
+    
     private var valueTreesByKey = [String:ValueTree]()
     private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", storedType: "")
     private var identifiersOfUnchanged = Set<UniqueIdentifier>()
@@ -68,13 +46,13 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         return valueTreesByKey[currentValueTreeKey]?.get(key)
     }
     
-    public func load(from url:URL, with serializer: RepositorySerializer) throws {
+    public func load(from url:URL, with serializer: ForestSerializer) throws {
         try queue.sync {
             try valueTreesByKey = serializer.load(from:url)
         }
     }
     
-    public func save(to url:URL, with serializer: RepositorySerializer) throws {
+    public func save(to url:URL, with serializer: ForestSerializer) throws {
         try queue.sync {
             try serializer.save(valueTreesByKey, to:url)
         }
@@ -402,4 +380,3 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         currentTreeReference = storedReference
     }
 }
-
