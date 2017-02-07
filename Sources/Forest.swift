@@ -24,10 +24,21 @@ public struct Forest: Sequence {
     
     public init() {}
     
+    public init(valueTrees: [ValueTree]) {
+        for tree in valueTrees {
+            self.valueTreesByReference[tree.valueTreeReference] = tree
+        }
+    }
+    
     public var absenteeProvider: (([ValueTreeReference]) -> [ValueTree?])?
     
-    public func makeIterator() -> ForestRanger {
-        
+    public func makeIterator() -> AnyIterator<ValueTree> {
+        let trees = Array(valueTreesByReference.values)
+        var i = -1
+        return AnyIterator {
+            i += 1
+            return i < trees.count ? trees[i] : nil
+        }
     }
     
     public mutating func deleteValueTrees(descendentFrom reference: ValueTreeReference) {

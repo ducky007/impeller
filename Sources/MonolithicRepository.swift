@@ -14,7 +14,7 @@ import Foundation
 public class MonolithicRepository: LocalRepository, Exchangable {
     public var uniqueIdentifier: UniqueIdentifier = uuid()
     private let queue = DispatchQueue(label: "impeller.monolithicRepository")
-    private var forest: Forest
+    private var forest = Forest()
     
     private var valueTreesByKey = [String:ValueTree]()
     private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", storedType: "")
@@ -48,13 +48,13 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     
     public func load(from url:URL, with serializer: ForestSerializer) throws {
         try queue.sync {
-            try valueTreesByKey = serializer.load(from:url)
+            try forest = serializer.load(from:url)
         }
     }
     
     public func save(to url:URL, with serializer: ForestSerializer) throws {
         try queue.sync {
-            try serializer.save(valueTreesByKey, to:url)
+            try serializer.save(forest, to:url)
         }
     }
     

@@ -11,15 +11,13 @@ import Foundation
 public struct ForestRanger: IteratorProtocol {
     public typealias Element = ValueTreeReference
     
-    public let forest: Forest
-    public let roots: [ValueTreeReference]
+    public let plantedValueTree: PlantedValueTree
     private var visitationList: [ValueTreeReference] = []
     private var index = -1
     
-    init(forest: Forest, roots: [ValueTreeReference]) {
-        self.forest = forest
-        self.roots = roots
-        visitationList = roots.reduce([]) { list, root in list + visitationList(forTreeAt: root) }
+    init(plantedValueTree: PlantedValueTree) {
+        self.plantedValueTree = plantedValueTree
+        visitationList = visitationList(forTreeAt: plantedValueTree.root)
     }
     
     public mutating func next() -> ValueTreeReference? {
@@ -29,7 +27,7 @@ public struct ForestRanger: IteratorProtocol {
     }
     
     private func visitationList(forTreeAt reference: ValueTreeReference) -> [ValueTreeReference] {
-        guard let valueTree = forest.valueTree(at: reference) else { return [] }
+        guard let valueTree = plantedValueTree.forest.valueTree(at: reference) else { return [] }
         
         var children: [ValueTreeReference] = []
         for (_, property) in valueTree.propertiesByName {

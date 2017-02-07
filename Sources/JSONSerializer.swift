@@ -26,16 +26,21 @@ public class JSONForestSerializer: ForestSerializer {
     
     public init() {}
     
-    public func load(from url:URL) throws -> [String:ValueTree] {
+    public func load(from url:URL) throws -> Forest {
         let data = try Data(contentsOf: url)
         guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] else {
             throw JSONSerializationError.invalidFormat(reason: "JSON root was not a dictionary")
         }
-        return try dict.mapValues { try ValueTree(withJSONRepresentation: $1) }
+        let trees = try dict.map { (_, json) in try ValueTree(withJSONRepresentation: json) }
+        return Forest(valueTrees: trees)
     }
     
-    public func save(_ valueTreesByKey:[String:ValueTree], to url:URL) throws {
-        let json = valueTreesByKey.mapValues { $1.JSONRepresentation() }
+    public func save(_ forest:Forest, to url:URL) throws {
+        var json = [String:Any]()
+        for tree in forest {
+            let key = tree.valueTreeReference.asString
+            json[key] = tree.JSONRepresentation()
+        }
         let data = try JSONSerialization.data(withJSONObject: json, options: [])
         try data.write(to: url)
     }

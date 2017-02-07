@@ -17,6 +17,10 @@ public struct ValueTreeReference: Equatable, Hashable {
     public static func ==(left: ValueTreeReference, right: ValueTreeReference) -> Bool {
         return left.uniqueIdentifier == right.uniqueIdentifier && left.storedType == right.storedType
     }
+    
+    public var asString: String {
+        return "\(storedType)__\(uniqueIdentifier)"
+    }
 }
 
 
@@ -52,7 +56,7 @@ public struct ValueTree: Equatable, Hashable {
     }
     
     public static func ==(left: ValueTree, right: ValueTree) -> Bool {
-        return left.propertiesByName == right.propertiesByName && left.metadata == right.metadata && left.storedType == right.storedType
+        return left.storedType == right.storedType && left.metadata == right.metadata && left.propertiesByName == right.propertiesByName
     }
     
     func merged(with other: ValueTree?) -> ValueTree {

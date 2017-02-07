@@ -41,6 +41,7 @@
 		07AB7AE11E473EF10025A33B /* Forest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE01E473EF10025A33B /* Forest.swift */; };
 		07AB7AE31E473F340025A33B /* TimestampCursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE21E473F340025A33B /* TimestampCursor.swift */; };
 		07AB7AE51E4740270025A33B /* ForestRanger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE41E4740270025A33B /* ForestRanger.swift */; };
+		07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE61E4A4F010025A33B /* PlantedValueTree.swift */; };
 		07C5C2291E40F3F6009596F4 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5C2281E40F3F6009596F4 /* SerializationTests.swift */; };
 		07C769991E0469920063CB4A /* ValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C769981E0469920063CB4A /* ValueTree.swift */; };
 /* End PBXBuildFile section */
@@ -117,6 +118,7 @@
 		07AB7AE01E473EF10025A33B /* Forest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Forest.swift; sourceTree = "<group>"; };
 		07AB7AE21E473F340025A33B /* TimestampCursor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimestampCursor.swift; sourceTree = "<group>"; };
 		07AB7AE41E4740270025A33B /* ForestRanger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForestRanger.swift; sourceTree = "<group>"; };
+		07AB7AE61E4A4F010025A33B /* PlantedValueTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlantedValueTree.swift; sourceTree = "<group>"; };
 		07C5C2281E40F3F6009596F4 /* SerializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		07C769981E0469920063CB4A /* ValueTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTree.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -159,12 +161,12 @@
 		071B35C01E16EA3B00781F99 /* Value Trees */ = {
 			isa = PBXGroup;
 			children = (
+				071B35BE1E16E78300781F99 /* Primitive.swift */,
+				071B35BC1E16952400781F99 /* Property.swift */,
 				07C769981E0469920063CB4A /* ValueTree.swift */,
+				07AB7AE61E4A4F010025A33B /* PlantedValueTree.swift */,
 				07AB7AE01E473EF10025A33B /* Forest.swift */,
 				07AB7AE41E4740270025A33B /* ForestRanger.swift */,
-				071B35BC1E16952400781F99 /* Property.swift */,
-				071B35BE1E16E78300781F99 /* Primitive.swift */,
-				073CB7CC1E02F29200E567D7 /* ValueTreeBuilder.swift */,
 			);
 			name = "Value Trees";
 			sourceTree = "<group>";
@@ -175,6 +177,7 @@
 				0737AAFE1DF952A200ABBA90 /* Metadata.swift */,
 				0737AB021DF952CB00ABBA90 /* Storable.swift */,
 				077C8B5E1E01A80B0073B628 /* StorablePrimitive.swift */,
+				073CB7CC1E02F29200E567D7 /* ValueTreeBuilder.swift */,
 			);
 			name = Storables;
 			sourceTree = "<group>";
@@ -515,6 +518,7 @@
 				07AB7AE51E4740270025A33B /* ForestRanger.swift in Sources */,
 				0737AAFF1DF952A200ABBA90 /* Metadata.swift in Sources */,
 				07AB7AE31E473F340025A33B /* TimestampCursor.swift in Sources */,
+				07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */,
 				071B35BD1E16952400781F99 /* Property.swift in Sources */,
 				0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */,
 				071B35AF1E15273E00781F99 /* CloudKitRepository.swift in Sources */,
