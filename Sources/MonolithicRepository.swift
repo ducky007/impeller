@@ -16,35 +16,35 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private let queue = DispatchQueue(label: "impeller.monolithicRepository")
     private var forest = Forest()
     
-    private var valueTreesByKey = [String:ValueTree]()
-    private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", repositedType: "")
-    private var identifiersOfUnchanged = Set<UniqueIdentifier>()
+//    private var valueTreesByKey = [String:ValueTree]()
+//    private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", repositedType: "")
+//    private var identifiersOfUnchanged = Set<UniqueIdentifier>()
     private var commitContext: Any?
     private var commitTimestamp = Date.distantPast.timeIntervalSinceReferenceDate
-    private var isDeletionPass = false
+//    private var isDeletionPass = false
 
     public init() {}
     
-    private class func key(for reference: ValueTreeReference) -> String {
-        return "\(reference.repositedType)/\(reference.uniqueIdentifier)"
-    }
+//    private class func key(for reference: ValueTreeReference) -> String {
+//        return "\(reference.repositedType)/\(reference.uniqueIdentifier)"
+//    }
     
-    private var currentValueTreeKey: String {
-        return MonolithicRepository.key(for: currentTreeReference)
-    }
+//    private var currentValueTreeKey: String {
+//        return MonolithicRepository.key(for: currentTreeReference)
+//    }
     
-    private var currentValueTree: ValueTree? {
-        get {
-            return valueTreesByKey[currentValueTreeKey]
-        }
-        set {
-            valueTreesByKey[currentValueTreeKey] = newValue
-        }
-    }
+//    private var currentValueTree: ValueTree? {
+//        get {
+//            return valueTreesByKey[currentValueTreeKey]
+//        }
+//        set {
+//            valueTreesByKey[currentValueTreeKey] = newValue
+//        }
+//    }
     
-    private func currentTreeProperty(_ key: String) -> Property? {
-        return valueTreesByKey[currentValueTreeKey]?.get(key)
-    }
+//    private func currentTreeProperty(_ key: String) -> Property? {
+//        return valueTreesByKey[currentValueTreeKey]?.get(key)
+//    }
     
     public func load(from url:URL, with serializer: ForestSerializer) throws {
         try queue.sync {
@@ -59,19 +59,75 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     /// Resolves conflicts and commits, and sets the value on out to resolved value.
-    public func commit<T:Repositable>(_ value: inout T, context: Any? = nil) {
+    public func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
         queue.sync {
-            prepareToMakeChanges(forRoot: value)
-            commitContext = context
-            writeValueAndDescendants(of: &value)
+            performCommit(&value, resolvingConflictsWith: conflictResolver)
         }
     }
     
-    public func delete<T:Repositable>(_ value: inout T) {
+    private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
+        let commitTimestamp = Date.timeIntervalSinceReferenceDate
+        let planter = ForestPlanter(withRoot: value)
+        let commitForest = planter.forest
+        for newTree in commitForest {
+            var resolvedTree: ValueTree!
+            var resolvedVersion: RepositedVersion = 0
+            let resolvedTimestamp = commitTimestamp
+            var changed = true
+            let repoTree = self.forest.valueTree(at: newTree.valueTreeReference)
+            
+            if repoTree == nil {
+                // First commit
+                resolvedTree = newTree
+                resolvedVersion = 0
+            }
+            else if repoTree == newTree {
+                // Values unchanged from store. Don't commit data again
+                resolvedTree = newTree
+                resolvedVersion = newTree.metadata.version
+                changed = false
+            }
+            else if newTree.metadata.version == repoTree!.metadata.version {
+                // Store has not changed since the base value was taken, so just commit the new value directly
+                resolvedTree = newTree
+                resolvedVersion = newTree.metadata.version + 1
+            }
+            else {
+                // Conflict with store. Resolve.
+                if let conflictResolver = conflictResolver {
+                    resolvedTree = conflictResolver.resolved(fromConflictOf: newTree, with: repoTree!)
+                }
+                else {
+                    resolvedTree = newTree
+                }
+                resolvedVersion = max(value.metadata.version, repoTree!.metadata.version) + 1
+            }
+            
+            if changed {
+                resolvedTree.metadata.timestamp = resolvedTimestamp
+                resolvedTree.metadata.version = resolvedVersion
+                forest.update(resolvedTree)
+            }
+        }
+    }
+    
+    public func delete<T:Repositable>(_ root: inout T) {
         queue.sync {
-            prepareToMakeChanges(forRoot: value)
-            isDeletionPass = true
-            writeValueAndDescendants(of: &value)
+            // First merge in-memory and repo values, then delete
+            self.performCommit(&root)
+            self.performDelete(&root)
+        }
+    }
+    
+    private func performDelete<T:Repositable>(_ root: inout T) {
+        let timestamp = Date.timeIntervalSinceReferenceDate
+        let rootTree = ValueTreePlanter(root).valueTree
+        let plantedTree = PlantedValueTree(forest: forest, root: rootTree.valueTreeReference)
+        for ref in plantedTree {
+            var tree = self.forest.valueTree(at: ref)!
+            tree.metadata.isDeleted = true
+            tree.metadata.timestamp = timestamp
+            self.forest.update(tree)
         }
     }
     
@@ -295,13 +351,13 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         values = updatedValues
     }
     
-    private func prepareToMakeChanges<T:Repositable>(forRoot value: T) {
-        commitTimestamp = Date.timeIntervalSinceReferenceDate
-        identifiersOfUnchanged = Set<UniqueIdentifier>()
-        currentTreeReference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: T.repositedType)
-        isDeletionPass = false
-        commitContext = nil
-    }
+//    private func prepareToMakeChanges<T:Repositable>(forRoot value: T) {
+//        commitTimestamp = Date.timeIntervalSinceReferenceDate
+//        identifiersOfUnchanged = Set<UniqueIdentifier>()
+//        currentTreeReference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: T.repositedType)
+//        isDeletionPass = false
+//        commitContext = nil
+//    }
     
     private func writeValueAndDescendants<T:Repositable>(of value: inout T) {
         let storeValue:T? = repositableValue(identifiedBy: value.metadata.uniqueIdentifier)
@@ -310,7 +366,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         }
         
         var resolvedValue:T
-        var resolvedVersion:StoredVersion = 0
+        var resolvedVersion:RepositedVersion = 0
         let resolvedTimestamp = commitTimestamp
         var changed = true
         

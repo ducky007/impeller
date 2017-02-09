@@ -245,7 +245,7 @@ extension CKRecord {
     
     var asValueTree: ValueTree? {
         guard let timestamp = self["metadata__timestamp"] as? TimeInterval,
-              let version = self["metadata__version"] as? StoredVersion,
+              let version = self["metadata__version"] as? RepositedVersion,
               let isDeleted = self["metadata__isDeleted"] as? Bool else {
             return nil
         }

@@ -65,7 +65,7 @@ extension ValueTree: JSONRepresentable {
             let repositedType = metadataDict[JSONKey.repositedType.rawValue] as? RepositedType,
             let timestamp = metadataDict[JSONKey.timestamp.rawValue] as? TimeInterval,
             let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool,
-            let version = metadataDict[JSONKey.version.rawValue] as? StoredVersion else {
+            let version = metadataDict[JSONKey.version.rawValue] as? RepositedVersion else {
             throw JSONSerializationError.invalidMetadata
         }
         

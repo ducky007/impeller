@@ -36,7 +36,7 @@ public extension Repositable {
     }
     
     var valueTree: ValueTree {
-        let builder = ValueTreeBuilder(self)
+        let builder = ValueTreePlanter(self)
         return builder.valueTree
     }
 }

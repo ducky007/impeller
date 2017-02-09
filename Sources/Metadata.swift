@@ -10,7 +10,7 @@ import Foundation
 
 
 public typealias UniqueIdentifier = String
-typealias StoredVersion = UInt64
+typealias RepositedVersion = UInt64
 
 
 public struct Metadata: Equatable {
@@ -22,7 +22,7 @@ public struct Metadata: Equatable {
     public let uniqueIdentifier: UniqueIdentifier
     public internal(set) var timestamp: TimeInterval // When stored
     public internal(set) var isDeleted: Bool
-    internal var version: StoredVersion = 0
+    internal var version: RepositedVersion = 0
     
     public init(uniqueIdentifier: UniqueIdentifier = UUID().uuidString) {
         self.uniqueIdentifier = uniqueIdentifier
