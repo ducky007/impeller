@@ -10,7 +10,6 @@ import Impeller
 
 struct Child: Storable {
     
-    static let storedType = "Child"
     var metadata = Metadata()
     
     var age = 0

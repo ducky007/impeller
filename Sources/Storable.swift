@@ -21,6 +21,12 @@ public protocol Storable {
 
 
 public extension Storable {
+    static var storedType: StoredType {
+        let baseType = "\(type(of: self))" // Includes .Type
+        let type = baseType.characters.split(separator: ".").first!
+        return String(type)
+    }
+    
     func resolvedValue(forConflictWith newValue:Storable, context: Any? = nil) -> Self {
         return self // Choose the local value by default
     }

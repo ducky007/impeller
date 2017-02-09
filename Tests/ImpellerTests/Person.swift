@@ -10,7 +10,6 @@ import Impeller
 
 struct Person: Storable {
     
-    static let storedType = "Person"
     var metadata = Metadata()
     
     var name = "No Name"
