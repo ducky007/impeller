@@ -8,9 +8,9 @@
 
 import Impeller
 
-struct Parent: Storable {
+struct Parent: Repositable {
     
-    static let storedType = "Parent"
+    static let typeInRepository = "Parent"
     var metadata = Metadata()
     
     var child = Child()

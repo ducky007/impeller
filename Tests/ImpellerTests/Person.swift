@@ -8,9 +8,9 @@
 
 import Impeller
 
-struct Person: Storable {
+struct Person: Repositable {
     
-    static let storedType = "Person"
+    static let typeInRepository = "Person"
     var metadata = Metadata()
     
     var name = "No Name"

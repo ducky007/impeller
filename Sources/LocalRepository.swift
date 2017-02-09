@@ -7,26 +7,26 @@
 //
 
 public protocol LocalRepository: ReadRepository, WriteRepository {
-    func commit<T:Storable>(_ value: inout T, context: Any?)
-    func delete<T:Storable>(_ value: inout T)
+    func commit<T:Repositable>(_ value: inout T, context: Any?)
+    func delete<T:Repositable>(_ value: inout T)
 }
 
 
 public protocol ReadRepository: class {
-    func read<T:StorablePrimitive>(_ key:String) -> T?
-    func read<T:StorablePrimitive>(optionalFor key:String) -> T??
-    func read<T:StorablePrimitive>(_ key:String) -> [T]?
-    func read<T:Storable>(_ key:String) -> T?
-    func read<T:Storable>(optionalFor key:String) -> T??
-    func read<T:Storable>(_ key:String) -> [T]?
+    func read<T:RepositablePrimitive>(_ key:String) -> T?
+    func read<T:RepositablePrimitive>(optionalFor key:String) -> T??
+    func read<T:RepositablePrimitive>(_ key:String) -> [T]?
+    func read<T:Repositable>(_ key:String) -> T?
+    func read<T:Repositable>(optionalFor key:String) -> T??
+    func read<T:Repositable>(_ key:String) -> [T]?
 }
 
 
 public protocol WriteRepository: class {
-    func write<T:StorablePrimitive>(_ value:T, for key:String)
-    func write<T:StorablePrimitive>(_ optionalValue:T?, for key:String)
-    func write<T:StorablePrimitive>(_ values:[T], for key:String)
-    func write<T:Storable>(_ value:inout T, for key:String)
-    func write<T:Storable>(_ optionalValue:inout T?, for key:String)
-    func write<T:Storable>(_ values:inout [T], for key:String)
+    func write<T:RepositablePrimitive>(_ value:T, for key:String)
+    func write<T:RepositablePrimitive>(_ optionalValue:T?, for key:String)
+    func write<T:RepositablePrimitive>(_ values:[T], for key:String)
+    func write<T:Repositable>(_ value:inout T, for key:String)
+    func write<T:Repositable>(_ optionalValue:inout T?, for key:String)
+    func write<T:Repositable>(_ values:inout [T], for key:String)
 }

@@ -8,9 +8,9 @@
 
 import Impeller
 
-struct Child: Storable {
+struct Child: Repositable {
     
-    static let storedType = "Child"
+    static let typeInRepository = "Child"
     var metadata = Metadata()
     
     var age = 0
@@ -30,7 +30,7 @@ struct Child: Storable {
     }
     
     // Take child with newest timestamp
-    func resolvedValue(forConflictWith newValue:Storable, context: Any? = nil) -> Child {
+    func resolvedValue(forConflictWith newValue:Repositable, context: Any? = nil) -> Child {
         return newValue.metadata.timestamp > metadata.timestamp ? newValue as! Child : self
     }
 }

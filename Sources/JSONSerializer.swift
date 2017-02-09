@@ -51,7 +51,7 @@ public class JSONForestSerializer: ForestSerializer {
 extension ValueTree: JSONRepresentable {
     
     public enum JSONKey: String {
-        case metadata, storedType, uniqueIdentifier, timestamp, isDeleted, version, propertiesByName
+        case metadata, typeInRepository, uniqueIdentifier, timestamp, isDeleted, version, propertiesByName
     }
     
     public init(withJSONRepresentation json: Any) throws {
@@ -62,7 +62,7 @@ extension ValueTree: JSONRepresentable {
         guard
             let metadataDict = json[JSONKey.metadata.rawValue] as? [String:Any],
             let id = metadataDict[JSONKey.uniqueIdentifier.rawValue] as? String,
-            let storedType = metadataDict[JSONKey.storedType.rawValue] as? StoredType,
+            let typeInRepository = metadataDict[JSONKey.typeInRepository.rawValue] as? RepositedType,
             let timestamp = metadataDict[JSONKey.timestamp.rawValue] as? TimeInterval,
             let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool,
             let version = metadataDict[JSONKey.version.rawValue] as? StoredVersion else {
@@ -74,7 +74,7 @@ extension ValueTree: JSONRepresentable {
         metadata.isDeleted = isDeleted
         metadata.version = version
         
-        self.storedType = storedType
+        self.typeInRepository = typeInRepository
         self.metadata = metadata
         
         guard let propertiesByName = json[JSONKey.propertiesByName.rawValue] as? [String:Any] else {
@@ -88,7 +88,7 @@ extension ValueTree: JSONRepresentable {
     public func JSONRepresentation() -> Any {
         var json = [String:Any]()
         let metadataDict: [String:Any] = [
-            JSONKey.storedType.rawValue : storedType,
+            JSONKey.typeInRepository.rawValue : typeInRepository,
             JSONKey.uniqueIdentifier.rawValue : metadata.uniqueIdentifier,
             JSONKey.timestamp.rawValue : metadata.timestamp,
             JSONKey.isDeleted.rawValue : metadata.isDeleted,
@@ -190,7 +190,7 @@ extension Property: JSONRepresentable {
                     let referencedIdentifiers = json[JSONKey.referencedIdentifiers.rawValue] as? [String] else {
                     throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
                 }
-                let refs = referencedIdentifiers.map { ValueTreeReference(uniqueIdentifier: $0, storedType: referencedType) }
+                let refs = referencedIdentifiers.map { ValueTreeReference(uniqueIdentifier: $0, typeInRepository: referencedType) }
                 self = .valueTreeReferences(refs)
             }
         }
@@ -222,7 +222,7 @@ extension Property: JSONRepresentable {
             let referencedIdentifier = dict[JSONKey.referencedIdentifier.rawValue] as? String else {
                 throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
         }
-        let ref = ValueTreeReference(uniqueIdentifier: referencedIdentifier, storedType: referencedType)
+        let ref = ValueTreeReference(uniqueIdentifier: referencedIdentifier, typeInRepository: referencedType)
         self = .valueTreeReference(ref)
     }
     
@@ -251,11 +251,11 @@ extension Property: JSONRepresentable {
                 result[JSONKey.primitiveType.rawValue] = 0
             }
         case .valueTreeReference(let ref):
-            result[JSONKey.referencedType.rawValue] = ref.storedType
+            result[JSONKey.referencedType.rawValue] = ref.typeInRepository
             result[JSONKey.referencedIdentifier.rawValue] = ref.uniqueIdentifier
         case .optionalValueTreeReference(let ref):
             if let ref = ref {
-                result[JSONKey.referencedType.rawValue] = ref.storedType
+                result[JSONKey.referencedType.rawValue] = ref.typeInRepository
                 result[JSONKey.referencedIdentifier.rawValue] = ref.uniqueIdentifier
             }
             else {
@@ -263,7 +263,7 @@ extension Property: JSONRepresentable {
             }
         case .valueTreeReferences(let refs):
             if refs.count > 0 {
-                result[JSONKey.referencedType.rawValue] = refs.first!.storedType
+                result[JSONKey.referencedType.rawValue] = refs.first!.typeInRepository
                 result[JSONKey.referencedIdentifiers.rawValue] = refs.map { $0.uniqueIdentifier }
             }
             else {

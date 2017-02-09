@@ -1,5 +1,5 @@
 //
-//  StorablePrimitive.swift
+//  RepositablePrimitive.swift
 //  Impeller
 //
 //  Created by Drew McCormack on 14/12/2016.
@@ -8,12 +8,12 @@
 
 import Foundation
 
-public protocol StorablePrimitive {
+public protocol RepositablePrimitive {
     init?(_ primitive: Primitive)
     var primitive: Primitive { get }
 }
 
-extension String: StorablePrimitive {
+extension String: RepositablePrimitive {
     public init?(_ primitive: Primitive) {
         switch primitive {
         case .string(let s):
@@ -28,7 +28,7 @@ extension String: StorablePrimitive {
     }
 }
 
-extension Int: StorablePrimitive {
+extension Int: RepositablePrimitive {
     public init?(_ primitive: Primitive) {
         switch primitive {
         case .int(let i):
@@ -43,7 +43,7 @@ extension Int: StorablePrimitive {
     }
 }
 
-extension Float: StorablePrimitive {
+extension Float: RepositablePrimitive {
     public init?(_ primitive: Primitive) {
         switch primitive {
         case .float(let f):
@@ -58,7 +58,7 @@ extension Float: StorablePrimitive {
     }
 }
 
-extension Bool: StorablePrimitive {
+extension Bool: RepositablePrimitive {
     public init?(_ primitive: Primitive) {
         switch primitive {
         case .bool(let b):
@@ -73,7 +73,7 @@ extension Bool: StorablePrimitive {
     }
 }
 
-extension Data: StorablePrimitive {
+extension Data: RepositablePrimitive {
     public init?(_ primitive: Primitive) {
         switch primitive {
         case .data(let d):

@@ -9,8 +9,8 @@
 import Foundation
 import Impeller
 
-struct TaskList: Storable, Equatable {
-    static var storedType: StoredType { return "TaskList" }
+struct TaskList: Repositable, Equatable {
+    static var typeInRepository: RepositedType { return "TaskList" }
     
     var metadata = Metadata()
     var tasks:[Task] = []

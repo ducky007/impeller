@@ -8,38 +8,38 @@
 
 public struct ValueTreeReference: Equatable, Hashable {
     let uniqueIdentifier: UniqueIdentifier
-    let storedType: StoredType
+    let typeInRepository: RepositedType
     
     public var hashValue: Int {
-        return uniqueIdentifier.hash ^ storedType.hash
+        return uniqueIdentifier.hash ^ typeInRepository.hash
     }
     
     public static func ==(left: ValueTreeReference, right: ValueTreeReference) -> Bool {
-        return left.uniqueIdentifier == right.uniqueIdentifier && left.storedType == right.storedType
+        return left.uniqueIdentifier == right.uniqueIdentifier && left.typeInRepository == right.typeInRepository
     }
     
     public var asString: String {
-        return "\(storedType)__\(uniqueIdentifier)"
+        return "\(typeInRepository)__\(uniqueIdentifier)"
     }
 }
 
 
 public struct ValueTree: Equatable, Hashable {
     public var metadata: Metadata
-    public var storedType: StoredType
+    public var typeInRepository: RepositedType
     
     public internal(set) var propertiesByName = [String:Property]()
     
     public var valueTreeReference: ValueTreeReference {
-        return ValueTreeReference(uniqueIdentifier: metadata.uniqueIdentifier, storedType: storedType)
+        return ValueTreeReference(uniqueIdentifier: metadata.uniqueIdentifier, typeInRepository: typeInRepository)
     }
     
     public var propertyNames: [String] {
         return Array(propertiesByName.keys)
     }
 
-    public init(storedType: StoredType, metadata: Metadata) {
-        self.storedType = storedType
+    public init(typeInRepository: RepositedType, metadata: Metadata) {
+        self.typeInRepository = typeInRepository
         self.metadata = metadata
     }
     
@@ -56,7 +56,7 @@ public struct ValueTree: Equatable, Hashable {
     }
     
     public static func ==(left: ValueTree, right: ValueTree) -> Bool {
-        return left.storedType == right.storedType && left.metadata == right.metadata && left.propertiesByName == right.propertiesByName
+        return left.typeInRepository == right.typeInRepository && left.metadata == right.metadata && left.propertiesByName == right.propertiesByName
     }
     
     func merged(with other: ValueTree?) -> ValueTree {

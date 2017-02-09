@@ -73,17 +73,17 @@ Other examples of usage can be found in the various _Tests_ folders.
 
 Unlike most data modelling frameworks (_e.g._ Core Data), Impeller is based on value types (`struct`s). There is no modeling tool, or model file; you simply create your own `struct`s.
 
-#### Storable Protocol
+#### Repositable Protocol
 
-You need to make your `struct`s conform to the `Storable` protocol.
+You need to make your `struct`s conform to the `Repositable` protocol.
 
-    struct Task: Storable {
+    struct Task: Repositable {
 
-The `Storable` protocol looks like this.
+The `Repositable` protocol looks like this.
 
-    public protocol Storable {
+    public protocol Repositable {
         var metadata: Metadata { get set }
-        static var storedType: StoredType { get }
+        static var typeInRepository: RepositedType { get }
     
         init?(readingFrom repository:ReadRepository)
         mutating func write(in repository:WriteRepository)
@@ -93,8 +93,8 @@ The `Storable` protocol looks like this.
 
 Your new type must supply a protocol for metadata storage, and a `static` property that provides a string representing the type of the `struct` (usually just the `struct` name).
 
-     struct Task: Storable {
-        static var storedType: StoredType { return "Task" }
+     struct Task: Repositable {
+        static var typeInRepository: RepositedType { return "Task" }
         var metadata = Metadata()
 
 The `metadata` property is used internally by the framework, and you should generally refrain from modifying it. 
@@ -105,7 +105,7 @@ One exception to this rule is the `uniqueIdentifier`, which is a global identifi
 
 The properties of your `struct` can be anything supported by Swift. Properties are not persisted to a repository by default, so you can also include properties that you don't wish to have stored.
 
-     struct Task: Storable {
+     struct Task: Repositable {
         ...
          
         var text = ""
@@ -136,9 +136,9 @@ The `ReadRepository` protocol provides methods to read a variety of data types, 
 - Built-in types like `Int`, `Float`, `String`, and `Data`, which are called _primitive types_
 - Optional variants of primitive types (_e.g._ `Int?`)
 - Arrays of simple built-in types (_e.g._ `[Float]`)
-- Other `Storable` types (_e.g._ `TagList`, where `TagList` is a `struct` conforming to `Storable`)
-- Optional variants of `Storable` types (_e.g._ `TagList?`)
-- Arrays of `Storable` types (_e.g._ `[TagList]`)
+- Other `Repositable` types (_e.g._ `TagList`, where `TagList` is a `struct` conforming to `Repositable`)
+- Optional variants of `Repositable` types (_e.g._ `TagList?`)
+- Arrays of `Repositable` types (_e.g._ `[TagList]`)
 
 These types are the only ones supported by repositories, but this does not mean your `struct`s cannot include other types. You simply convert to and from these primitive types when storing and loading data, just as you do when using `NSCoding`. For example, if a `struct` includes a `Set`, you would simply convert the `Set` to an `Array` for storage. (It would be wise to sort the `Array`, to prevent unnecessary updates to the repository when the set is unchanged.)
 
@@ -166,7 +166,7 @@ Each repository type has a different setup. Typically, you simply initialize the
 
 #### Storing Changes
 
-There is no central managing object in Impeller, like the `NSManagedObjectContext` of Core Data. Instead, when you want to save a `Storable` type, you simply ask the repository to commit it.
+There is no central managing object in Impeller, like the `NSManagedObjectContext` of Core Data. Instead, when you want to save a `Repositable` type, you simply ask the repository to commit it.
 
     localRepository.commit(&task)
 
@@ -207,9 +207,9 @@ When committing changes to a repository, it is possible that the repository valu
 
 You can implement 
 
-    func resolvedValue(forConflictWith newValue:Storable, context: Any?) -> Self
+    func resolvedValue(forConflictWith newValue:Repositable, context: Any?) -> Self
 
-from the `Storable` protocol in your `struct`. By default, this function will do a generic merge, favoring the values in `self`, thus giving the values currently in memory precedence. You can override that behavior to return a different `struct` value, which will be what gets stored in the repository (...and returned from the `commit` function).
+from the `Repositable` protocol in your `struct`. By default, this function will do a generic merge, favoring the values in `self`, thus giving the values currently in memory precedence. You can override that behavior to return a different `struct` value, which will be what gets stored in the repository (...and returned from the `commit` function).
 
 ### Gotchas
 
@@ -248,13 +248,13 @@ While it is not possible to create cyclic graphs of related values, you can use 
 
 #### Copying Sub-Values
 
-Storable `struct`s can contain other storable values, forming a tree, but there is nothing to stop you from copying a sub-value into a different variable. For example
+Repositable `struct`s can contain other repositable values, forming a tree, but there is nothing to stop you from copying a sub-value into a different variable. For example
 
-    struct Child: Storable {
+    struct Child: Repositable {
         ...
     }
     
-    struct Person: Storable {
+    struct Person: Repositable {
         ...
         var child: Child
     }
@@ -278,7 +278,7 @@ This code would create a whole new `Child` value in the repository, which would 
 
 #### Trees with Variable Depth
 
-In theory you can create trees of variable depth using `struct`s and `protocol`s. For example, it would be possible to create an `AnyStorable` `struct` that forwards all function calls to a wrapped value of a concrete `Storable` type. 
+In theory you can create trees of variable depth using `struct`s and `protocol`s. For example, it would be possible to create an `AnyRepositable` `struct` that forwards all function calls to a wrapped value of a concrete `Repositable` type. 
 
 At this point, it is unclear if Impeller can be made to work with such types. It is an area of investigation.
 
@@ -291,7 +291,7 @@ The project is still in a very early stage, and not much more than a concept pro
 - In-memory repository
 - CloudKit repository
 - Exchange
-- Single timestamp for each `Storable` value. Used in exchanging.
+- Single timestamp for each `Repositable` value. Used in exchanging.
 
 ### Imminent Projects
 
@@ -301,4 +301,4 @@ There are many plans for improving on this. Here are some of the projects that h
 - SQLite repository
 - Timestamps for individual properties, for more granular merging
 - Option to use three-way merging, with originally fetched value, newly fetched value, and in-memory value
-- Decoupling of Impeller `Storable` types, and the underlying value trees, to facilitate other front-ends (_e.g._ Core Data)
+- Decoupling of Impeller `Repositable` types, and the underlying value trees, to facilitate other front-ends (_e.g._ Core Data)

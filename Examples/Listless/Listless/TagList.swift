@@ -9,8 +9,8 @@
 import Foundation
 import Impeller
 
-struct TagList: Storable, Equatable {
-    static var storedType: StoredType { return "TagList" }
+struct TagList: Repositable, Equatable {
+    static var typeInRepository: RepositedType { return "TagList" }
     
     var metadata = Metadata()
     var tags: [String] = []
