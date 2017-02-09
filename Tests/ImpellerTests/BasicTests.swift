@@ -19,7 +19,7 @@ class BasicTests: XCTestCase {
     }
     
     func testStoredType() {
-        XCTAssertEqual(Person.storedType, "Person")
+        XCTAssertEqual(Person.repositedType, "Person")
     }
     
     func testSave() {
