@@ -17,7 +17,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private var forest = Forest()
     
     private var valueTreesByKey = [String:ValueTree]()
-    private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", typeInRepository: "")
+    private var currentTreeReference = ValueTreeReference(uniqueIdentifier: "", repositedType: "")
     private var identifiersOfUnchanged = Set<UniqueIdentifier>()
     private var commitContext: Any?
     private var commitTimestamp = Date.distantPast.timeIntervalSinceReferenceDate
@@ -26,7 +26,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     public init() {}
     
     private class func key(for reference: ValueTreeReference) -> String {
-        return "\(reference.typeInRepository)/\(reference.uniqueIdentifier)"
+        return "\(reference.repositedType)/\(reference.uniqueIdentifier)"
     }
     
     private var currentValueTreeKey: String {
@@ -104,7 +104,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     public func pull(_ valueTrees: [ValueTree], completionHandler completion: @escaping CompletionHandler) {
         queue.async {
             for newTree in valueTrees {
-                let reference = ValueTreeReference(uniqueIdentifier: newTree.metadata.uniqueIdentifier, typeInRepository: newTree.typeInRepository)
+                let reference = ValueTreeReference(uniqueIdentifier: newTree.metadata.uniqueIdentifier, repositedType: newTree.repositedType)
                 let key = MonolithicRepository.key(for: reference)
                 self.valueTreesByKey[key] = newTree.merged(with: self.valueTreesByKey[key])
             }
@@ -206,7 +206,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     public func write<T:Repositable>(_ value: inout T, for key:String) {
-        let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, typeInRepository: T.typeInRepository)
+        let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: T.repositedType)
         
         // Fetch existing store value of descendant, and delete (if it differs from new reference)
         if let oldReference = valueTreesByKey[currentValueTreeKey]!.get(key)?.asValueTreeReference(), reference != oldReference {
@@ -232,7 +232,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     public func write<T:Repositable>(_ value: inout T?, for key:String) {
         var reference: ValueTreeReference?
         if let value = value {
-            reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, typeInRepository: T.typeInRepository)
+            reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: T.repositedType)
         }
         
         // Fetch existing store value of descendant, and delete
@@ -263,7 +263,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     
     public func write<T:Repositable>(_ values: inout [T], for key:String) {
         let references = values.map {
-            ValueTreeReference(uniqueIdentifier: $0.metadata.uniqueIdentifier, typeInRepository: T.typeInRepository)
+            ValueTreeReference(uniqueIdentifier: $0.metadata.uniqueIdentifier, repositedType: T.repositedType)
         }
         
         // Determine which values get orphaned, and delete them
@@ -298,7 +298,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private func prepareToMakeChanges<T:Repositable>(forRoot value: T) {
         commitTimestamp = Date.timeIntervalSinceReferenceDate
         identifiersOfUnchanged = Set<UniqueIdentifier>()
-        currentTreeReference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, typeInRepository: T.typeInRepository)
+        currentTreeReference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: T.repositedType)
         isDeletionPass = false
         commitContext = nil
     }
@@ -306,7 +306,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private func writeValueAndDescendants<T:Repositable>(of value: inout T) {
         let storeValue:T? = repositableValue(identifiedBy: value.metadata.uniqueIdentifier)
         if storeValue == nil {
-            valueTreesByKey[currentValueTreeKey] = ValueTree(typeInRepository: T.typeInRepository, metadata: value.metadata)
+            valueTreesByKey[currentValueTreeKey] = ValueTree(repositedType: T.repositedType, metadata: value.metadata)
         }
         
         var resolvedValue:T
@@ -361,7 +361,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private func repositableValue<T:Repositable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T? {
         var result: T?
         transaction {
-            currentTreeReference = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, typeInRepository: T.typeInRepository)
+            currentTreeReference = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
             guard let valueTree = currentValueTree, !valueTree.metadata.isDeleted else {
                 return
             }

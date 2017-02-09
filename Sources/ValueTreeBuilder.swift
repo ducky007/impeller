@@ -11,7 +11,7 @@ final class ValueTreeBuilder<T:Repositable> : WriteRepository {
     private var repositable: T
     
     init(_ repositable:T) {
-        valueTree = ValueTree(typeInRepository: T.typeInRepository, metadata: repositable.metadata)
+        valueTree = ValueTree(repositedType: T.repositedType, metadata: repositable.metadata)
         self.repositable = repositable
         self.repositable.write(in: self)
     }
@@ -32,19 +32,19 @@ final class ValueTreeBuilder<T:Repositable> : WriteRepository {
     }
     
     func write<T:Repositable>(_ value:inout T, for key:String) {
-        let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, typeInRepository: T.typeInRepository)
+        let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: T.repositedType)
         valueTree.set(key, to: .valueTreeReference(reference))
     }
     
     func write<T:Repositable>(_ value:inout T?, for key:String) {
         let id = value?.metadata.uniqueIdentifier
-        let reference = id != nil ? ValueTreeReference(uniqueIdentifier: id!, typeInRepository: T.typeInRepository) : nil
+        let reference = id != nil ? ValueTreeReference(uniqueIdentifier: id!, repositedType: T.repositedType) : nil
         valueTree.set(key, to: .optionalValueTreeReference(reference))
     }
     
     func write<T:Repositable>(_ values:inout [T], for key:String) {
         let references = values.map {
-            ValueTreeReference(uniqueIdentifier: $0.metadata.uniqueIdentifier, typeInRepository: T.typeInRepository)
+            ValueTreeReference(uniqueIdentifier: $0.metadata.uniqueIdentifier, repositedType: T.repositedType)
         }
         valueTree.set(key, to: .valueTreeReferences(references))
     }

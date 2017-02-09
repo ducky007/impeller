@@ -122,7 +122,7 @@ public class CloudKitRepository: Exchangable {
                 let cloudValueTree = record?.asValueTree
                 let mergedTree = pulledValueTree.merged(with: cloudValueTree)
                 if mergedTree != cloudValueTree {
-                    let recordToUpdate = record ?? CKRecord(recordType: pulledValueTree.typeInRepository, recordID: recordID)
+                    let recordToUpdate = record ?? CKRecord(recordType: pulledValueTree.repositedType, recordID: recordID)
                     mergedTree.updateRecord(recordToUpdate)
                     recordsToUpload.append(recordToUpdate)
                 }
@@ -148,7 +148,7 @@ public class CloudKitRepository: Exchangable {
 extension ValueTree {
     
     var recordName: String {
-        return "\(typeInRepository)__\(metadata.uniqueIdentifier)"
+        return "\(repositedType)__\(metadata.uniqueIdentifier)"
     }
     
     func recordID(inZoneWithID zoneID: CKRecordZoneID) -> CKRecordID {
@@ -157,7 +157,7 @@ extension ValueTree {
     
     func makeRecord(inZoneWithID zoneID:CKRecordZoneID) -> CKRecord {
         let recordID = self.recordID(inZoneWithID: zoneID)
-        let newRecord = CKRecord(recordType: typeInRepository, recordID: recordID)
+        let newRecord = CKRecord(recordType: repositedType, recordID: recordID)
         updateRecord(newRecord)
         return newRecord
     }
@@ -198,10 +198,10 @@ extension ValueTree {
                     record[name] = [] as CKRecordValue
                 }
             case .valueTreeReference(let ref):
-                record[name] = [ref.typeInRepository, ref.uniqueIdentifier] as CKRecordValue
+                record[name] = [ref.repositedType, ref.uniqueIdentifier] as CKRecordValue
             case .optionalValueTreeReference(let ref):
                 if let ref = ref {
-                    record[name] = [ref.typeInRepository, ref.uniqueIdentifier] as CKRecordValue
+                    record[name] = [ref.repositedType, ref.uniqueIdentifier] as CKRecordValue
                 }
                 else {
                     record[name] = ["nil", ""] as CKRecordValue
@@ -218,9 +218,9 @@ extension ValueTree {
 extension ValueTreeReference {
     
     var recordName: String {
-        // Record name is typeInRepository + "__" + unique id. This is because in Impeller,
+        // Record name is repositedType + "__" + unique id. This is because in Impeller,
         // the uniqueId only has to be unique for a single stored type
-        return "\(typeInRepository)__\(uniqueIdentifier)"
+        return "\(repositedType)__\(uniqueIdentifier)"
     }
     
 }
@@ -231,7 +231,7 @@ extension String {
     var valueTreeReference: ValueTreeReference {
         let recordName = self
         let components = recordName.components(separatedBy: "__")
-        return ValueTreeReference(uniqueIdentifier: components[1], typeInRepository: components[0])
+        return ValueTreeReference(uniqueIdentifier: components[1], repositedType: components[0])
     }
 
 }
@@ -256,7 +256,7 @@ extension CKRecord {
         metadata.timestamp = timestamp
         metadata.isDeleted = isDeleted
         
-        var valueTree = ValueTree(typeInRepository: recordType, metadata: metadata)
+        var valueTree = ValueTree(repositedType: recordType, metadata: metadata)
         for key in allKeys() {
             if key.contains("__metadata__") { continue }
             
@@ -342,7 +342,7 @@ extension CKRecord {
                 }
             case .valueTreeReference:
                 guard let v = value as? [String], v.count == 2 else { continue }
-                let ref = ValueTreeReference(uniqueIdentifier: v[1], typeInRepository: v[0])
+                let ref = ValueTreeReference(uniqueIdentifier: v[1], repositedType: v[0])
                 property = .valueTreeReference(ref)
             case .optionalValueTreeReference:
                 guard let v = value as? [String], v.count == 2 else { continue }
@@ -350,7 +350,7 @@ extension CKRecord {
                     property = .optionalValueTreeReference(nil)
                 }
                 else {
-                    let ref = ValueTreeReference(uniqueIdentifier: v[1], typeInRepository: v[0])
+                    let ref = ValueTreeReference(uniqueIdentifier: v[1], repositedType: v[0])
                     property = .optionalValueTreeReference(ref)
                 }
             case .valueTreeReferences:

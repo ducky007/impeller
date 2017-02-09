@@ -8,38 +8,38 @@
 
 public struct ValueTreeReference: Equatable, Hashable {
     let uniqueIdentifier: UniqueIdentifier
-    let typeInRepository: RepositedType
+    let repositedType: RepositedType
     
     public var hashValue: Int {
-        return uniqueIdentifier.hash ^ typeInRepository.hash
+        return uniqueIdentifier.hash ^ repositedType.hash
     }
     
     public static func ==(left: ValueTreeReference, right: ValueTreeReference) -> Bool {
-        return left.uniqueIdentifier == right.uniqueIdentifier && left.typeInRepository == right.typeInRepository
+        return left.uniqueIdentifier == right.uniqueIdentifier && left.repositedType == right.repositedType
     }
     
     public var asString: String {
-        return "\(typeInRepository)__\(uniqueIdentifier)"
+        return "\(repositedType)__\(uniqueIdentifier)"
     }
 }
 
 
 public struct ValueTree: Equatable, Hashable {
     public var metadata: Metadata
-    public var typeInRepository: RepositedType
+    public var repositedType: RepositedType
     
     public internal(set) var propertiesByName = [String:Property]()
     
     public var valueTreeReference: ValueTreeReference {
-        return ValueTreeReference(uniqueIdentifier: metadata.uniqueIdentifier, typeInRepository: typeInRepository)
+        return ValueTreeReference(uniqueIdentifier: metadata.uniqueIdentifier, repositedType: repositedType)
     }
     
     public var propertyNames: [String] {
         return Array(propertiesByName.keys)
     }
 
-    public init(typeInRepository: RepositedType, metadata: Metadata) {
-        self.typeInRepository = typeInRepository
+    public init(repositedType: RepositedType, metadata: Metadata) {
+        self.repositedType = repositedType
         self.metadata = metadata
     }
     
@@ -56,7 +56,7 @@ public struct ValueTree: Equatable, Hashable {
     }
     
     public static func ==(left: ValueTree, right: ValueTree) -> Bool {
-        return left.typeInRepository == right.typeInRepository && left.metadata == right.metadata && left.propertiesByName == right.propertiesByName
+        return left.repositedType == right.repositedType && left.metadata == right.metadata && left.propertiesByName == right.propertiesByName
     }
     
     func merged(with other: ValueTree?) -> ValueTree {

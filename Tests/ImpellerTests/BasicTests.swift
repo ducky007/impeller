@@ -18,6 +18,10 @@ class BasicTests: XCTestCase {
         repository = MonolithicRepository()
     }
     
+    func testStoredType() {
+        XCTAssertEqual(Person.storedType, "Person")
+    }
+    
     func testSave() {
         var person = Person()
         person.name = "Bob"

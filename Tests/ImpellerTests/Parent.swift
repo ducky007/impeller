@@ -10,7 +10,6 @@ import Impeller
 
 struct Parent: Repositable {
     
-    static let typeInRepository = "Parent"
     var metadata = Metadata()
     
     var child = Child()

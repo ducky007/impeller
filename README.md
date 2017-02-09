@@ -83,7 +83,7 @@ The `Repositable` protocol looks like this.
 
     public protocol Repositable {
         var metadata: Metadata { get set }
-        static var typeInRepository: RepositedType { get }
+        static var repositedType: RepositedType { get }
     
         init?(readingFrom repository:ReadRepository)
         mutating func write(in repository:WriteRepository)
@@ -94,7 +94,7 @@ The `Repositable` protocol looks like this.
 Your new type must supply a protocol for metadata storage, and a `static` property that provides a string representing the type of the `struct` (usually just the `struct` name).
 
      struct Task: Repositable {
-        static var typeInRepository: RepositedType { return "Task" }
+        static var repositedType: RepositedType { return "Task" }
         var metadata = Metadata()
 
 The `metadata` property is used internally by the framework, and you should generally refrain from modifying it. 

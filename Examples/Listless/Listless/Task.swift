@@ -10,7 +10,7 @@ import Foundation
 import Impeller
 
 struct Task: Repositable, Equatable {
-    static var typeInRepository: RepositedType { return "Task" }
+    static var repositedType: RepositedType { return "Task" }
     
     var metadata = Metadata()
     var text = ""

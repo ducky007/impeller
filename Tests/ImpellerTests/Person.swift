@@ -10,7 +10,6 @@ import Impeller
 
 struct Person: Repositable {
     
-    static let typeInRepository = "Person"
     var metadata = Metadata()
     
     var name = "No Name"

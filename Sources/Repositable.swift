@@ -11,7 +11,7 @@ public typealias RepositedType = String
 
 public protocol Repositable {
     var metadata: Metadata { get set }
-    static var typeInRepository: RepositedType { get }
+    static var repositedType: RepositedType { get }
     
     init?(readingFrom repository:ReadRepository)
     mutating func write(in repository:WriteRepository)
@@ -21,6 +21,12 @@ public protocol Repositable {
 
 
 public extension Repositable {
+    static var repositedType: RepositedType {
+        let baseType = "\(type(of: self))" // Includes .Type
+        let type = baseType.characters.split(separator: ".").first!
+        return String(type)
+    }
+    
     func resolvedValue(forConflictWith newValue:Repositable, context: Any? = nil) -> Self {
         return self // Choose the local value by default
     }
