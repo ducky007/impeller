@@ -107,7 +107,7 @@ public struct Forest: Sequence {
         return valueTreesByReference[reference]
     }
     
-    public func valueTrees(changeedSince timestamp: TimeInterval) -> [ValueTree] {
+    public func valueTrees(changedSince timestamp: TimeInterval) -> [ValueTree] {
         var valueTrees = [ValueTree]()
         for (_, valueTree) in self.valueTreesByReference {
             let time = valueTree.metadata.timestamp
