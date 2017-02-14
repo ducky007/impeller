@@ -6,8 +6,9 @@
 //  Copyright © 2016 Drew McCormack. All rights reserved.
 //
 
-public protocol LocalRepository: ReadRepository, WriteRepository {
-    func commit<T:Repositable>(_ value: inout T, context: Any?)
+public protocol LocalRepository {
+    func fetchValue<T:Repositable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T?
+    func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver?)
     func delete<T:Repositable>(_ value: inout T)
 }
 

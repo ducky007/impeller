@@ -42,6 +42,14 @@ public struct Forest: Sequence {
     }
     
     public mutating func deleteValueTrees(descendentFrom reference: ValueTreeReference) {
+        let timestamp = Date.timeIntervalSinceReferenceDate
+        let plantedTree = PlantedValueTree(forest: self, root: reference)
+        for ref in plantedTree {
+            var tree = valueTree(at: ref)!
+            tree.metadata.isDeleted = true
+            tree.metadata.timestamp = timestamp
+            update(tree)
+        }
     }
     
     // Inserts a value tree, or updates an existing one
@@ -50,11 +58,53 @@ public struct Forest: Sequence {
         valueTreesByReference[ref] = valueTree
     }
     
-    public func valueTree(at reference: ValueTreeReference) -> ValueTree? {
-        return valueTreesByReference[reference]
+    public mutating func merge(_ plantedValueTree: PlantedValueTree, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
+        let timestamp = Date.timeIntervalSinceReferenceDate
+        for ref in plantedValueTree {
+            var resolvedTree: ValueTree!
+            var resolvedVersion: RepositedVersion = 0
+            let resolvedTimestamp = timestamp
+            var changed = true
+            
+            let treeInOtherForest = plantedValueTree.forest.valueTree(at: ref)!
+            let treeInThisForest = valueTree(at: ref)
+            if treeInThisForest == nil {
+                // First commit
+                resolvedTree = treeInOtherForest
+                resolvedVersion = 0
+            }
+            else if treeInThisForest == treeInOtherForest {
+                // Values unchanged from store. Don't commit data again
+                resolvedTree = treeInOtherForest
+                resolvedVersion = treeInOtherForest.metadata.version
+                changed = false
+            }
+            else if treeInOtherForest.metadata.version == treeInThisForest!.metadata.version {
+                // Store has not changed since the base value was taken, so just commit the new value directly
+                resolvedTree = treeInOtherForest
+                resolvedVersion = treeInOtherForest.metadata.version + 1
+            }
+            else {
+                // Conflict with store. Resolve.
+                if let conflictResolver = conflictResolver {
+                    resolvedTree = conflictResolver.resolved(fromConflictOf: treeInOtherForest, with: treeInThisForest!)
+                }
+                else {
+                    resolvedTree = treeInOtherForest
+                }
+                resolvedVersion = Swift.max(treeInOtherForest.metadata.version, treeInThisForest!.metadata.version) + 1
+            }
+            
+            if changed {
+                resolvedTree.metadata.timestamp = resolvedTimestamp
+                resolvedTree.metadata.version = resolvedVersion
+                update(resolvedTree)
+            }
+        }
     }
     
-    public func merge(in valueTree: ValueTree, resolvingConflictsWith conflictResolver: ConflictResolver) {
+    public func valueTree(at reference: ValueTreeReference) -> ValueTree? {
+        return valueTreesByReference[reference]
     }
     
     public func valueTrees(changeedSince timestamp: TimeInterval) -> [ValueTree] {

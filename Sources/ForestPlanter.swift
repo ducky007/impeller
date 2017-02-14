@@ -9,7 +9,7 @@
 import Foundation
 
 /// Makes a forest from a tree of Repositables
-public class ForestPlanter: ValueTreePlanterDelegate {
+final class ForestPlanter: ValueTreePlanterDelegate {
     
     var forest = Forest()
     
