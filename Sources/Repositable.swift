@@ -13,8 +13,8 @@ public protocol Repositable {
     var metadata: Metadata { get set }
     static var repositedType: RepositedType { get }
     
-    init?(readingFrom repository:ReadRepository)
-    mutating func write(in repository:WriteRepository)
+    init(readingFrom repository:PropertyReader)
+    mutating func write(in repository:PropertyWriter)
     
     func resolvedValue(forConflictWith newValue:Repositable, context: Any?) -> Self
 }
@@ -36,7 +36,7 @@ public extension Repositable {
     }
     
     var valueTree: ValueTree {
-        let builder = ValueTreePlanter(self)
+        let builder = ValueTreePlanter(repositable: self)
         return builder.valueTree
     }
 }

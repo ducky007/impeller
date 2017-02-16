@@ -17,12 +17,12 @@ struct Parent: Repositable {
 
     init() {}
     
-    init?(readingFrom repository:ReadRepository) {
+    init(readingFrom repository:PropertyReader) {
         child = repository.read("child")!
         children = repository.read("children")!
     }
     
-    mutating func write(in repository:WriteRepository) {
+    mutating func write(in repository:PropertyWriter) {
         repository.write(&child, for: "child")
         repository.write(&children, for: "children")
     }

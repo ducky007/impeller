@@ -16,11 +16,11 @@ struct Child: Repositable {
         
     init() {}
     
-    init?(readingFrom repository:ReadRepository) {
+    init(readingFrom repository:PropertyReader) {
         age = repository.read("age")!
     }
     
-    mutating func write(in repository:WriteRepository) {
+    mutating func write(in repository:PropertyWriter) {
         repository.write(age, for: "age")
     }
     

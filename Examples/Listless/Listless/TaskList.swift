@@ -17,11 +17,11 @@ struct TaskList: Repositable, Equatable {
     
     init() {}
     
-    init?(readingFrom repository:ReadRepository) {
+    init(readingFrom repository:PropertyReader) {
         tasks = repository.read(Key.tasks.rawValue)!
     }
     
-    mutating func write(in repository:WriteRepository) {
+    mutating func write(in repository:PropertyWriter) {
         repository.write(&tasks, for: Key.tasks.rawValue)
     }
     

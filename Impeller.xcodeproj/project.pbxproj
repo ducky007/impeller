@@ -36,6 +36,8 @@
 		0737AB091DF9537300ABBA90 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0737AB081DF9537300ABBA90 /* Person.swift */; };
 		073CB7CD1E02F29200E567D7 /* ValueTreePlanter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073CB7CC1E02F29200E567D7 /* ValueTreePlanter.swift */; };
 		073D518F1E4CFDD60059CFD9 /* ForestPlanter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D518E1E4CFDD60059CFD9 /* ForestPlanter.swift */; };
+		073D51981E54D2F50059CFD9 /* ValueTreeHarvester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D51971E54D2F50059CFD9 /* ValueTreeHarvester.swift */; };
+		073D519A1E54D3040059CFD9 /* ForestHarvester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D51991E54D3040059CFD9 /* ForestHarvester.swift */; };
 		0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772A0961E3A1703008E85C8 /* JSONForestSerializer.swift */; };
 		077C8B5F1E01A80B0073B628 /* RepositablePrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077C8B5E1E01A80B0073B628 /* RepositablePrimitive.swift */; };
 		077F2A011E43C6BE00A1FF59 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077F2A001E43C6BE00A1FF59 /* Log.swift */; };
@@ -113,6 +115,8 @@
 		0737AB081DF9537300ABBA90 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		073CB7CC1E02F29200E567D7 /* ValueTreePlanter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTreePlanter.swift; sourceTree = "<group>"; };
 		073D518E1E4CFDD60059CFD9 /* ForestPlanter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForestPlanter.swift; sourceTree = "<group>"; };
+		073D51971E54D2F50059CFD9 /* ValueTreeHarvester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTreeHarvester.swift; sourceTree = "<group>"; };
+		073D51991E54D3040059CFD9 /* ForestHarvester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForestHarvester.swift; sourceTree = "<group>"; };
 		0744C5DC1E26B8A7005799E6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0772A0961E3A1703008E85C8 /* JSONForestSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONForestSerializer.swift; sourceTree = "<group>"; };
 		077C8B5E1E01A80B0073B628 /* RepositablePrimitive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepositablePrimitive.swift; sourceTree = "<group>"; };
@@ -181,6 +185,8 @@
 				077C8B5E1E01A80B0073B628 /* RepositablePrimitive.swift */,
 				073CB7CC1E02F29200E567D7 /* ValueTreePlanter.swift */,
 				073D518E1E4CFDD60059CFD9 /* ForestPlanter.swift */,
+				073D51971E54D2F50059CFD9 /* ValueTreeHarvester.swift */,
+				073D51991E54D3040059CFD9 /* ForestHarvester.swift */,
 			);
 			name = Repositables;
 			sourceTree = "<group>";
@@ -525,6 +531,7 @@
 				07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */,
 				071B35BD1E16952400781F99 /* Property.swift in Sources */,
 				0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */,
+				073D51981E54D2F50059CFD9 /* ValueTreeHarvester.swift in Sources */,
 				071B35AF1E15273E00781F99 /* CloudKitRepository.swift in Sources */,
 				0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */,
 				07AB7AE11E473EF10025A33B /* Forest.swift in Sources */,
@@ -535,6 +542,7 @@
 				0737AB011DF952C000ABBA90 /* LocalRepository.swift in Sources */,
 				07C769991E0469920063CB4A /* ValueTree.swift in Sources */,
 				0737AB071DF9534300ABBA90 /* General.swift in Sources */,
+				073D519A1E54D3040059CFD9 /* ForestHarvester.swift in Sources */,
 				077C8B5F1E01A80B0073B628 /* RepositablePrimitive.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

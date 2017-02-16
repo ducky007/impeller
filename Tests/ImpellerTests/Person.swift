@@ -18,13 +18,13 @@ struct Person: Repositable {
     
     init() {}
     
-    init?(readingFrom repository:ReadRepository) {
+    init(readingFrom repository:PropertyReader) {
         name = repository.read("name")!
         age = repository.read(optionalFor: "age")!
         tags = repository.read("tags")!
     }
     
-    func write(in repository:WriteRepository) {
+    func write(in repository:PropertyWriter) {
         repository.write(name, for: "name")
         repository.write(age, for: "age")
         repository.write(tags, for: "tags")

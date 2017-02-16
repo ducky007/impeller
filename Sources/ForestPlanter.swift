@@ -9,17 +9,16 @@
 import Foundation
 
 /// Makes a forest from a tree of Repositables
-final class ForestPlanter: ValueTreePlanterDelegate {
+final class ForestPlanter {
     
     var forest = Forest()
     
-    public init<T:Repositable>(withRoot root:T) {
+    init<T:Repositable>(withRoot root:T) {
         plant(withRoot: root)
     }
     
     private func plant<T:Repositable>(withRoot repositable:T) {
-        let treePlanter = ValueTreePlanter(repositable)
-        treePlanter.delegate = self
+        let treePlanter = ValueTreePlanter(repositable:repositable, forestPlanter: self)
         forest.update(treePlanter.valueTree)
     }
     

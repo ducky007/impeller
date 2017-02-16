@@ -42,7 +42,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
         let planter = ForestPlanter(withRoot: value)
         let commitForest = planter.forest
-        let rootRef = ValueTreePlanter(value).valueTree.valueTreeReference
+        let rootRef = ValueTreePlanter(repositable: value).valueTree.valueTreeReference
         let plantedTree = PlantedValueTree(forest: commitForest, root: rootRef)
         forest.merge(plantedTree, resolvingConflictsWith: conflictResolver)
     }
@@ -56,7 +56,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     private func performDelete<T:Repositable>(_ root: inout T) {
-        let rootTree = ValueTreePlanter(root).valueTree
+        let rootTree = ValueTreePlanter(repositable: root).valueTree
         forest.deleteValueTrees(descendentFrom: rootTree.valueTreeReference)
     }
     
@@ -64,9 +64,11 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         var result: T?
         queue.sync {
             let ref = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
-            let valueTree = forest.valueTree(at: ref)
-            
-            // TODO: Convert value tree into repositable
+            if let valueTree = forest.valueTree(at: ref) {
+                let harvester = ForestHarvester(forest: forest)
+                let repositable:T = harvester.harvest(valueTree)
+                result = repositable
+            }
         }
         return result
     }
@@ -104,72 +106,6 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     
     public func makeCursor(fromData data: Data) -> Cursor? {
         return TimestampCursor(data: data)
-    }
-    
-    public func read<T:RepositablePrimitive>(_ key:String) -> T? {
-        if  let property = currentTreeProperty(key),
-            let primitive = property.asPrimitive() {
-            return T(primitive)
-        }
-        else {
-            return nil
-        }
-    }
-    
-    public func read<T:RepositablePrimitive>(optionalFor key:String) -> T?? {
-        if  let property = currentTreeProperty(key),
-            let optionalPrimitive = property.asOptionalPrimitive() {
-            if let primitive = optionalPrimitive {
-                return T(primitive)
-            }
-            else {
-                return nil as T?
-            }
-        }
-        else {
-            return nil
-        }
-    }
-    
-    public func read<T:RepositablePrimitive>(_ key:String) -> [T]? {
-        if  let property = currentTreeProperty(key),
-            let primitives = property.asPrimitives() {
-            return primitives.flatMap { T($0) }
-        }
-        else {
-            return nil
-        }
-    }
-    
-    public func read<T:Repositable>(_ key:String) -> T? {
-        if  let property = currentTreeProperty(key),
-            let reference = property.asValueTreeReference() {
-            return repositableValue(identifiedBy: reference.uniqueIdentifier)
-        }
-        else {
-            return nil
-        }
-    }
-    
-    public func read<T:Repositable>(optionalFor key:String) -> T?? {
-        if  let property = currentTreeProperty(key),
-            let optionalReference = property.asOptionalValueTreeReference(),
-            let reference = optionalReference {
-            return repositableValue(identifiedBy: reference.uniqueIdentifier)
-        }
-        else {
-            return nil
-        }
-    }
-    
-    public func read<T:Repositable>(_ key:String) -> [T]? {
-        if  let property = currentTreeProperty(key),
-            let references = property.asValueTreeReferences() {
-            return references.map { repositableValue(identifiedBy: $0.uniqueIdentifier)! }
-        }
-        else {
-            return nil
-        }
     }
 
 }

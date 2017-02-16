@@ -19,13 +19,13 @@ struct Task: Repositable, Equatable {
     
     init() {}
     
-    init?(readingFrom repository:ReadRepository) {
+    init(readingFrom repository:PropertyReader) {
         text = repository.read(Key.text.rawValue)!
         tagList = repository.read(Key.tagList.rawValue)!
         isComplete = repository.read(Key.isComplete.rawValue)!
     }
     
-    mutating func write(in repository:WriteRepository) {
+    mutating func write(in repository:PropertyWriter) {
         repository.write(text, for: Key.text.rawValue)
         repository.write(&tagList, for: Key.tagList.rawValue)
         repository.write(isComplete, for: Key.isComplete.rawValue)

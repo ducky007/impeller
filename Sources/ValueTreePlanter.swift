@@ -6,18 +6,15 @@
 //  Copyright © 2016 Drew McCormack. All rights reserved.
 //
 
-protocol ValueTreePlanterDelegate: class {
-    func processChild<T:Repositable>(_ child: T)
-}
-
 /// Makes a value tree from a single Repositable
-final class ValueTreePlanter<T:Repositable> : WriteRepository {
+final class ValueTreePlanter<T:Repositable>: PropertyWriter {
     private (set) var valueTree: ValueTree
     private var repositable: T
-    weak var delegate: ValueTreePlanterDelegate?
+    weak var forestPlanter: ForestPlanter?
     
-    init(_ repositable:T) {
+    init(repositable:T, forestPlanter: ForestPlanter? = nil) {
         valueTree = ValueTree(repositedType: T.repositedType, metadata: repositable.metadata)
+        self.forestPlanter = forestPlanter
         self.repositable = repositable
         self.repositable.write(in: self)
     }
@@ -40,14 +37,14 @@ final class ValueTreePlanter<T:Repositable> : WriteRepository {
     func write<PropertyType:Repositable>(_ value:inout PropertyType, for key:String) {
         let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType)
         valueTree.set(key, to: .valueTreeReference(reference))
-        delegate?.processChild(value)
+        forestPlanter?.processChild(value)
     }
     
     func write<PropertyType:Repositable>(_ value:inout PropertyType?, for key:String) {
         let id = value?.metadata.uniqueIdentifier
         let reference = id != nil ? ValueTreeReference(uniqueIdentifier: id!, repositedType: PropertyType.repositedType) : nil
         valueTree.set(key, to: .optionalValueTreeReference(reference))
-        if let value = value { delegate?.processChild(value) }
+        if let value = value { forestPlanter?.processChild(value) }
     }
     
     func write<PropertyType:Repositable>(_ values:inout [PropertyType], for key:String) {
@@ -55,7 +52,7 @@ final class ValueTreePlanter<T:Repositable> : WriteRepository {
             ValueTreeReference(uniqueIdentifier: $0.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType)
         }
         valueTree.set(key, to: .valueTreeReferences(references))
-        values.forEach { delegate?.processChild($0) }
+        values.forEach { forestPlanter?.processChild($0) }
     }
 }
 

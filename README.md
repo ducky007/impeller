@@ -85,8 +85,8 @@ The `Repositable` protocol looks like this.
         var metadata: Metadata { get set }
         static var repositedType: RepositedType { get }
     
-        init?(readingFrom repository:ReadRepository)
-        mutating func write(in repository:WriteRepository)
+        init?(readingFrom repository:PropertyReader)
+        mutating func write(in repository:PropertyWriter)
     }
 
 #### Metadata
@@ -121,7 +121,7 @@ You save and load data with Impeller in much the same way you do when using the 
 
 The initializer might look like this
 
-        init?(readingFrom repository:ReadRepository) {
+        init?(readingFrom repository:PropertyReader) {
             text = repository.read("text")!
             tagList = repository.read("tagList")!
             isComplete = repository.read("isComplete")!
@@ -131,7 +131,7 @@ The keys passed in are conventionally named the same as your properties, but thi
 
 #### Which Data Types are Supported?
 
-The `ReadRepository` protocol provides methods to read a variety of data types, including
+The `PropertyReader` protocol provides methods to read a variety of data types, including
 
 - Built-in types like `Int`, `Float`, `String`, and `Data`, which are called _primitive types_
 - Optional variants of primitive types (_e.g._ `Int?`)
@@ -144,9 +144,9 @@ These types are the only ones supported by repositories, but this does not mean 
 
 #### Storing Data
 
-The function for storing data into a repository makes use of methods in the `WriteRepository`.
+The function for storing data into a repository makes use of methods in the `PropertyWriter`.
 
-        mutating func write(in repository:WriteRepository) {
+        mutating func write(in repository:PropertyWriter) {
             repository.write(text, for: "text")
             repository.write(&tagList, for: "tagList")
             repository.write(isComplete, for: "isComplete")

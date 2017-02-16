@@ -13,7 +13,7 @@ public protocol LocalRepository {
 }
 
 
-public protocol ReadRepository: class {
+public protocol PropertyReader: class {
     func read<T:RepositablePrimitive>(_ key:String) -> T?
     func read<T:RepositablePrimitive>(optionalFor key:String) -> T??
     func read<T:RepositablePrimitive>(_ key:String) -> [T]?
@@ -23,7 +23,7 @@ public protocol ReadRepository: class {
 }
 
 
-public protocol WriteRepository: class {
+public protocol PropertyWriter: class {
     func write<T:RepositablePrimitive>(_ value:T, for key:String)
     func write<T:RepositablePrimitive>(_ optionalValue:T?, for key:String)
     func write<T:RepositablePrimitive>(_ values:[T], for key:String)
