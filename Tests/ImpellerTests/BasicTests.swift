@@ -133,13 +133,13 @@ class BasicTests: XCTestCase {
         child.age = 10
         repository.commit(&child)
     
-        // Update and set metadata to preceed repositoryd value
+        // Update and set metadata to preceed stored value
         child.age = 20
         child.metadata.timestamp -= 1.0
         child.metadata.version += 1
         repository.commit(&child)
         
-        // Ensure the repositoryd values survive, due to having more recent timestamp
+        // Ensure the stored values survive, due to having more recent timestamp
         XCTAssertEqual(child.age, 10)
         
         // Now set to later timestamp and commit
@@ -148,7 +148,7 @@ class BasicTests: XCTestCase {
         child.metadata.version += 1
         repository.commit(&child)
         
-        // Ensure the repositoryd values are updated
+        // Ensure the stored values are updated
         XCTAssertEqual(child.age, 20)
     }
     

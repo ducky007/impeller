@@ -33,13 +33,13 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     /// Resolves conflicts and commits, and sets the value on out to resolved value.
-    public func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
+    public func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         queue.sync {
             performCommit(&value, resolvingConflictsWith: conflictResolver)
         }
     }
     
-    private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
+    private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         // Plant
         let planter = ForestPlanter(withRoot: value)
         let commitForest = planter.forest

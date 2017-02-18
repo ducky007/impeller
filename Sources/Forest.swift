@@ -8,8 +8,10 @@
 
 import Foundation
 
-public protocol ConflictResolver {
-    func resolved(fromConflictOf valueTree: ValueTree, with otherValueTree: ValueTree) -> ValueTree
+public class ConflictResolver {
+    func resolved(fromConflictOf valueTree: ValueTree, with otherValueTree: ValueTree) -> ValueTree {
+        return valueTree.metadata.timestamp >= otherValueTree.metadata.timestamp ? valueTree : otherValueTree
+    }
 }
 
 
@@ -58,7 +60,7 @@ public struct Forest: Sequence {
         valueTreesByReference[ref] = valueTree
     }
     
-    public mutating func merge(_ plantedValueTree: PlantedValueTree, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
+    public mutating func merge(_ plantedValueTree: PlantedValueTree, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         let timestamp = Date.timeIntervalSinceReferenceDate
         for ref in plantedValueTree {
             var resolvedTree: ValueTree!
@@ -86,12 +88,7 @@ public struct Forest: Sequence {
             }
             else {
                 // Conflict with store. Resolve.
-                if let conflictResolver = conflictResolver {
-                    resolvedTree = conflictResolver.resolved(fromConflictOf: treeInOtherForest, with: treeInThisForest!)
-                }
-                else {
-                    resolvedTree = treeInOtherForest
-                }
+                resolvedTree = conflictResolver.resolved(fromConflictOf: treeInThisForest!, with: treeInOtherForest)
                 resolvedVersion = Swift.max(treeInOtherForest.metadata.version, treeInThisForest!.metadata.version) + 1
             }
             
