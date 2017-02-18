@@ -40,11 +40,19 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver? = nil) {
+        // Plant
         let planter = ForestPlanter(withRoot: value)
         let commitForest = planter.forest
         let rootRef = ValueTreePlanter(repositable: value).valueTree.valueTreeReference
         let plantedTree = PlantedValueTree(forest: commitForest, root: rootRef)
+    
+        // Merge into forest
         forest.merge(plantedTree, resolvingConflictsWith: conflictResolver)
+        
+        // Harvest
+        let newValueTree = forest.valueTree(at: rootRef)!
+        let harvester = ForestHarvester(forest: forest)
+        value = harvester.harvest(newValueTree)
     }
     
     public func delete<T:Repositable>(_ root: inout T) {

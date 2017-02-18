@@ -20,7 +20,9 @@ final class ValueTreeHarvester: PropertyReader {
     }
     
     public func harvest<T:Repositable>() -> T {
-        return T(readingFrom: self)
+        var repositable = T(readingFrom: self)
+        repositable.metadata = valueTree.metadata
+        return repositable
     }
     
     public func read<T:RepositablePrimitive>(_ key:String) -> T? {
