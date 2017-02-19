@@ -39,7 +39,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         }
     }
     
-    private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
+    private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver) {
         // Plant
         let planter = ForestPlanter(withRoot: value)
         let commitForest = planter.forest
@@ -55,10 +55,10 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         value = harvester.harvest(newValueTree)
     }
     
-    public func delete<T:Repositable>(_ root: inout T) {
+    public func delete<T:Repositable>(_ root: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         queue.sync {
             // First merge in-memory and repo values, then delete
-            self.performCommit(&root)
+            self.performCommit(&root, resolvingConflictsWith: conflictResolver)
             self.performDelete(&root)
         }
     }
@@ -72,7 +72,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         var result: T?
         queue.sync {
             let ref = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
-            if let valueTree = forest.valueTree(at: ref) {
+            if let valueTree = forest.valueTree(at: ref), !valueTree.metadata.isDeleted {
                 let harvester = ForestHarvester(forest: forest)
                 let repositable:T = harvester.harvest(valueTree)
                 result = repositable

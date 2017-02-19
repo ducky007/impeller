@@ -62,23 +62,37 @@ public struct Forest: Sequence {
     
     public mutating func merge(_ plantedValueTree: PlantedValueTree, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         let timestamp = Date.timeIntervalSinceReferenceDate
+        
+        // Gather identifiers for trees before the merge from both forests
+        var treeRefsPriorToMerge = Set<ValueTreeReference>()
+        let existingPlantedValueTree = PlantedValueTree(forest: self, root: plantedValueTree.root)
+        for ref in existingPlantedValueTree {
+            treeRefsPriorToMerge.insert(ref)
+        }
+        for ref in plantedValueTree {
+            treeRefsPriorToMerge.insert(ref)
+        }
+        
+        // Merge
         for ref in plantedValueTree {
             var resolvedTree: ValueTree!
             var resolvedVersion: RepositedVersion = 0
-            let resolvedTimestamp = timestamp
+            var resolvedTimestamp = timestamp
             var changed = true
             
             let treeInOtherForest = plantedValueTree.forest.valueTree(at: ref)!
             let treeInThisForest = valueTree(at: ref)
             if treeInThisForest == nil {
-                // First commit
+                // Does not exist in this forest. Just copy it over.
                 resolvedTree = treeInOtherForest
-                resolvedVersion = 0
+                resolvedVersion = treeInOtherForest.metadata.version
+                resolvedTimestamp = treeInOtherForest.metadata.timestamp
             }
             else if treeInThisForest == treeInOtherForest {
                 // Values unchanged from store. Don't commit data again
                 resolvedTree = treeInOtherForest
                 resolvedVersion = treeInOtherForest.metadata.version
+                resolvedTimestamp = treeInOtherForest.metadata.timestamp
                 changed = false
             }
             else if treeInOtherForest.metadata.version == treeInThisForest!.metadata.version {
@@ -97,6 +111,23 @@ public struct Forest: Sequence {
                 resolvedTree.metadata.version = resolvedVersion
                 update(resolvedTree)
             }
+        }
+        
+        // Determine what refs exist in the resolved tree
+        var treeRefsPostMerge = Set<ValueTreeReference>()
+        let resolvedPlantedValueTree = PlantedValueTree(forest: self, root: plantedValueTree.root)
+        for ref in resolvedPlantedValueTree {
+            treeRefsPostMerge.insert(ref)
+        }
+        
+        // Delete orphans
+        let orphanRefs = treeRefsPriorToMerge.subtracting(treeRefsPostMerge)
+        for orphanRef in orphanRefs {
+            var orphan = valueTree(at: orphanRef)!
+            orphan.metadata.isDeleted = true
+            orphan.metadata.timestamp = timestamp
+            orphan.metadata.version += 1
+            update(orphan)
         }
     }
     

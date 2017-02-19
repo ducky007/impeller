@@ -9,7 +9,7 @@
 public protocol LocalRepository {
     func fetchValue<T:Repositable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T?
     func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver)
-    func delete<T:Repositable>(_ value: inout T)
+    func delete<T:Repositable>(_ root: inout T, resolvingConflictsWith conflictResolver: ConflictResolver)
 }
 
 
