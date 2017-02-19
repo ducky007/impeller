@@ -37,7 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let navController = window!.rootViewController as! UINavigationController
         tasksViewController = navController.topViewController as! TasksViewController
-        
         updateTaskList()
     }
 
@@ -48,7 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
         sync { error in
-            try? self.localRepository.save(to: self.storeURL, with: self.serializer)
             UIApplication.shared.endBackgroundTask(backgroundTask)
         }
     }
@@ -73,6 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Error during exchange: \(error)")
             }
             else {
+                try! self.localRepository.save(to: self.storeURL, with: self.serializer)
                 self.updateTaskList()
             }
             

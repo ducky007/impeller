@@ -83,7 +83,6 @@ class TasksViewController: UITableViewController {
         return [action]
     }
 
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toTask" {
             let navController = segue.destination as! UINavigationController
