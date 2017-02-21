@@ -163,7 +163,7 @@ extension ValueTree {
     }
     
     func updateRecord(_ record: CKRecord) {
-        record["metadata__timestamp"] = metadata.timestamp as CKRecordValue
+        record["metadata__timestamp"] = metadata.commitTimestamp as CKRecordValue
         record["metadata__version"] = metadata.version as CKRecordValue
         record["metadata__isDeleted"] = metadata.isDeleted as CKRecordValue
         for name in propertyNames {
@@ -253,7 +253,7 @@ extension CKRecord {
         let ref = valueTreeReference
         var metadata = Metadata(uniqueIdentifier: ref.uniqueIdentifier)
         metadata.version = version
-        metadata.timestamp = timestamp
+        metadata.commitTimestamp = timestamp
         metadata.isDeleted = isDeleted
         
         var valueTree = ValueTree(repositedType: recordType, metadata: metadata)

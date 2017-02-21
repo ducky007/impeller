@@ -10,7 +10,7 @@ import Foundation
 
 public class ConflictResolver {
     func resolved(fromConflictOf valueTree: ValueTree, with otherValueTree: ValueTree) -> ValueTree {
-        return valueTree.metadata.timestamp >= otherValueTree.metadata.timestamp ? valueTree : otherValueTree
+        return valueTree.metadata.commitTimestamp >= otherValueTree.metadata.commitTimestamp ? valueTree : otherValueTree
     }
 }
 
@@ -49,7 +49,7 @@ public struct Forest: Sequence {
         for ref in plantedTree {
             var tree = valueTree(at: ref)!
             tree.metadata.isDeleted = true
-            tree.metadata.timestamp = timestamp
+            tree.metadata.commitTimestamp = timestamp
             update(tree)
         }
     }
@@ -76,39 +76,36 @@ public struct Forest: Sequence {
         // Merge
         for ref in plantedValueTree {
             var resolvedTree: ValueTree!
-            var resolvedVersion: RepositedVersion = 0
-            var resolvedTimestamp = timestamp
-            var changed = true
+            var updateVersion = false
+            var changed = false
             
             let treeInOtherForest = plantedValueTree.forest.valueTree(at: ref)!
             let treeInThisForest = valueTree(at: ref)
             if treeInThisForest == nil {
                 // Does not exist in this forest. Just copy it over.
                 resolvedTree = treeInOtherForest
-                resolvedVersion = treeInOtherForest.metadata.version
-                resolvedTimestamp = treeInOtherForest.metadata.timestamp
+                changed = true
             }
             else if treeInThisForest == treeInOtherForest {
                 // Values unchanged from store. Don't commit data again
-                resolvedTree = treeInOtherForest
-                resolvedVersion = treeInOtherForest.metadata.version
-                resolvedTimestamp = treeInOtherForest.metadata.timestamp
                 changed = false
             }
             else if treeInOtherForest.metadata.version == treeInThisForest!.metadata.version {
-                // Store has not changed since the base value was taken, so just commit the new value directly
+                // Trees differ, but have the same version. So assume the new tree has uncommited changes, overriding the stored value.
                 resolvedTree = treeInOtherForest
-                resolvedVersion = treeInOtherForest.metadata.version + 1
+                updateVersion = true
+                changed = true
             }
             else {
                 // Conflict with store. Resolve.
                 resolvedTree = conflictResolver.resolved(fromConflictOf: treeInThisForest!, with: treeInOtherForest)
-                resolvedVersion = Swift.max(treeInOtherForest.metadata.version, treeInThisForest!.metadata.version) + 1
+                updateVersion = true
+                changed = true
             }
             
             if changed {
-                resolvedTree.metadata.timestamp = resolvedTimestamp
-                resolvedTree.metadata.version = resolvedVersion
+                if updateVersion {  resolvedTree.metadata.generateVersion() }
+                resolvedTree.metadata.commitTimestamp = timestamp
                 update(resolvedTree)
             }
         }
@@ -125,8 +122,8 @@ public struct Forest: Sequence {
         for orphanRef in orphanRefs {
             var orphan = valueTree(at: orphanRef)!
             orphan.metadata.isDeleted = true
-            orphan.metadata.timestamp = timestamp
-            orphan.metadata.version += 1
+            orphan.metadata.commitTimestamp = timestamp
+            orphan.metadata.generateVersion()
             update(orphan)
         }
     }
@@ -138,7 +135,7 @@ public struct Forest: Sequence {
     public func valueTrees(changedSince timestamp: TimeInterval) -> [ValueTree] {
         var valueTrees = [ValueTree]()
         for (_, valueTree) in self.valueTreesByReference {
-            let time = valueTree.metadata.timestamp
+            let time = valueTree.metadata.commitTimestamp
             if timestamp <= time {
                 valueTrees.append(valueTree)
             }

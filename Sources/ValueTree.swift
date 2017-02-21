@@ -65,15 +65,13 @@ public struct ValueTree: Equatable, Hashable {
         }
         
         var mergedTree: ValueTree!
-        if metadata.timestamp < other.metadata.timestamp {
+        if metadata.commitTimestamp < other.metadata.commitTimestamp {
             mergedTree = other
-            mergedTree.metadata.version = max(other.metadata.version, metadata.version+1)
         }
         else {
             mergedTree = self
-            mergedTree.metadata.version = max(metadata.version, other.metadata.version+1)
         }
-        
+        mergedTree.metadata.generateVersion()
         mergedTree.metadata.isDeleted = metadata.isDeleted || other.metadata.isDeleted
         
         return mergedTree

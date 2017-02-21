@@ -10,9 +10,10 @@ import Foundation
 
 
 public typealias UniqueIdentifier = String
-typealias RepositedVersion = UInt64
+typealias RepositedVersion = String
 
 
+/// Metadata for a repositable
 public struct Metadata: Equatable {
     
     public enum Key: String {
@@ -20,18 +21,23 @@ public struct Metadata: Equatable {
     }
         
     public let uniqueIdentifier: UniqueIdentifier
-    public internal(set) var timestamp: TimeInterval // When stored
+    public internal(set) var commitTimestamp: TimeInterval
     public internal(set) var isDeleted: Bool
-    internal var version: RepositedVersion = 0
+    internal var version: RepositedVersion = UUID().uuidString
+    public var timestampsByPropertyName = [String:TimeInterval]()
     
     public init(uniqueIdentifier: UniqueIdentifier = UUID().uuidString) {
         self.uniqueIdentifier = uniqueIdentifier
-        self.timestamp = Date.timeIntervalSinceReferenceDate
+        self.commitTimestamp = Date.timeIntervalSinceReferenceDate
         self.isDeleted = false
+    }
+    
+    public mutating func generateVersion() {
+        version = UUID().uuidString
     }
         
     public static func == (left: Metadata, right: Metadata) -> Bool {
-        return left.version == right.version && left.timestamp == right.timestamp && left.uniqueIdentifier == right.uniqueIdentifier && left.isDeleted == right.isDeleted
+        return left.version == right.version && left.commitTimestamp == right.commitTimestamp && left.uniqueIdentifier == right.uniqueIdentifier && left.isDeleted == right.isDeleted
     }
     
 }

@@ -51,7 +51,7 @@ public class JSONForestSerializer: ForestSerializer {
 extension ValueTree: JSONRepresentable {
     
     public enum JSONKey: String {
-        case metadata, repositedType, uniqueIdentifier, timestamp, isDeleted, version, propertiesByName
+        case metadata, repositedType, uniqueIdentifier, commitTimestamp, isDeleted, version, propertiesByName
     }
     
     public init(withJSONRepresentation json: Any) throws {
@@ -63,14 +63,14 @@ extension ValueTree: JSONRepresentable {
             let metadataDict = json[JSONKey.metadata.rawValue] as? [String:Any],
             let id = metadataDict[JSONKey.uniqueIdentifier.rawValue] as? String,
             let repositedType = metadataDict[JSONKey.repositedType.rawValue] as? RepositedType,
-            let timestamp = metadataDict[JSONKey.timestamp.rawValue] as? TimeInterval,
+            let timestamp = metadataDict[JSONKey.commitTimestamp.rawValue] as? TimeInterval,
             let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool,
             let version = metadataDict[JSONKey.version.rawValue] as? RepositedVersion else {
             throw JSONSerializationError.invalidMetadata
         }
         
         var metadata = Metadata(uniqueIdentifier: id)
-        metadata.timestamp = timestamp
+        metadata.commitTimestamp = timestamp
         metadata.isDeleted = isDeleted
         metadata.version = version
         
@@ -90,7 +90,7 @@ extension ValueTree: JSONRepresentable {
         let metadataDict: [String:Any] = [
             JSONKey.repositedType.rawValue : repositedType,
             JSONKey.uniqueIdentifier.rawValue : metadata.uniqueIdentifier,
-            JSONKey.timestamp.rawValue : metadata.timestamp,
+            JSONKey.commitTimestamp.rawValue : metadata.commitTimestamp,
             JSONKey.isDeleted.rawValue : metadata.isDeleted,
             JSONKey.version.rawValue : metadata.version
         ]

@@ -30,6 +30,6 @@ struct Child: Repositable {
     
     // Take child with newest timestamp
     func resolvedValue(forConflictWith newValue:Repositable, context: Any? = nil) -> Child {
-        return newValue.metadata.timestamp > metadata.timestamp ? newValue as! Child : self
+        return newValue.metadata.commitTimestamp > metadata.commitTimestamp ? newValue as! Child : self
     }
 }

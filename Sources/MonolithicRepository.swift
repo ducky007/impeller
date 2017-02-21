@@ -87,7 +87,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             var maximumTimestamp = timestampCursor?.timestamp ?? Date.distantPast.timeIntervalSinceReferenceDate
             var valueTrees = [ValueTree]()
             for valueTree in self.forest {
-                let time = valueTree.metadata.timestamp
+                let time = valueTree.metadata.commitTimestamp
                 if timestampCursor == nil || timestampCursor!.timestamp <= time {
                     valueTrees.append(valueTree)
                     maximumTimestamp = max(maximumTimestamp, time)

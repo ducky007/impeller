@@ -51,16 +51,16 @@ class BasicTests: XCTestCase {
     
     func testUpdateBumpsVersion() {
         var person = Person()
+        let initialVersion = person.metadata.version
         person.name = "Bob"
         person.age = 10
-        XCTAssertEqual(person.metadata.version, 0)
 
         repository.commit(&person)
-        XCTAssertEqual(person.metadata.version, 0)
+        XCTAssertEqual(person.metadata.version, initialVersion)
         
         person.name = "Dave"
         repository.commit(&person)
-        XCTAssertEqual(person.metadata.version, 1)
+        XCTAssertNotEqual(person.metadata.version, initialVersion)
     }
     
     func testSaveWithNoChangeDoesNotChangeMetadata() {
@@ -135,8 +135,8 @@ class BasicTests: XCTestCase {
     
         // Update and set metadata to preceed stored value
         child.age = 20
-        child.metadata.timestamp -= 1.0
-        child.metadata.version += 1
+        child.metadata.commitTimestamp -= 1.0
+        child.metadata.generateVersion()
         repository.commit(&child)
         
         // Ensure the stored values survive, due to having more recent timestamp
@@ -144,8 +144,8 @@ class BasicTests: XCTestCase {
         
         // Now set to later timestamp and commit
         child.age = 20
-        child.metadata.timestamp += 1.0
-        child.metadata.version += 1
+        child.metadata.commitTimestamp += 1.0
+        child.metadata.generateVersion()
         repository.commit(&child)
         
         // Ensure the stored values are updated
