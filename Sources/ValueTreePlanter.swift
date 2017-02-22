@@ -16,7 +16,7 @@ final class ValueTreePlanter<T:Repositable>: PropertyWriter {
         valueTree = ValueTree(repositedType: T.repositedType, metadata: repositable.metadata)
         self.forestPlanter = forestPlanter
         self.repositable = repositable
-        self.repositable.write(in: self)
+        self.repositable.write(to: self)
     }
     
     func write<PropertyType:RepositablePrimitive>(_ value:PropertyType, for key:String) {

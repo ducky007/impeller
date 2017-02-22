@@ -87,16 +87,15 @@ The `Repositable` protocol looks like this.
         var metadata: Metadata { get set }
         static var repositedType: RepositedType { get }
     
-        init?(readingFrom repository:PropertyReader)
-        mutating func write(in repository:PropertyWriter)
+        init?(readingFrom reader:PropertyReader)
+        mutating func write(to writer:PropertyWriter)
     }
 
 #### Metadata
 
-Your new type must supply a protocol for metadata storage, and a `static` property that provides a string representing the type of the `struct` (usually just the `struct` name).
+Your new type must supply a property for metadata storage.
 
      struct Task: Repositable {
-        static var repositedType: RepositedType { return "Task" }
         var metadata = Metadata()
 
 The `metadata` property is used internally by the framework, and you should generally refrain from modifying it. 
@@ -123,10 +122,10 @@ You save and load data with Impeller in much the same way you do when using the 
 
 The initializer might look like this
 
-        init?(readingFrom repository:PropertyReader) {
-            text = repository.read("text")!
-            tagList = repository.read("tagList")!
-            isComplete = repository.read("isComplete")!
+        init?(readingFrom reader:PropertyReader) {
+            text = reader.read("text")!
+            tagList = reader.read("tagList")!
+            isComplete = reader.read("isComplete")!
         }
 
 The keys passed in are conventionally named the same as your properties, but this is not a necessity. You might find it useful to create an `enum` with `String` raw values to define these keys, rather than using literal values.
@@ -148,10 +147,10 @@ These types are the only ones supported by repositories, but this does not mean 
 
 The function for storing data into a repository makes use of methods in the `PropertyWriter`.
 
-        mutating func write(in repository:PropertyWriter) {
-            repository.write(text, for: "text")
-            repository.write(&tagList, for: "tagList")
-            repository.write(isComplete, for: "isComplete")
+        mutating func write(to writer:PropertyWriter) {
+            writer.write(text, for: "text")
+            writer.write(&tagList, for: "tagList")
+            writer.write(isComplete, for: "isComplete")
         }
 
 This is the inverse of loading data, so the keys used must correspond to the keys used in the initializer above.

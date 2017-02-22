@@ -18,16 +18,16 @@ struct Person: Repositable {
     
     init() {}
     
-    init(readingFrom repository:PropertyReader) {
-        name = repository.read("name")!
-        age = repository.read(optionalFor: "age")!
-        tags = repository.read("tags")!
+    init(readingFrom reader:PropertyReader) {
+        name = reader.read("name")!
+        age = reader.read(optionalFor: "age")!
+        tags = reader.read("tags")!
     }
     
-    func write(in repository:PropertyWriter) {
-        repository.write(name, for: "name")
-        repository.write(age, for: "age")
-        repository.write(tags, for: "tags")
+    func write(to writer:PropertyWriter) {
+        writer.write(name, for: "name")
+        writer.write(age, for: "age")
+        writer.write(tags, for: "tags")
     }
     
     static func == (left: Person, right: Person) -> Bool {

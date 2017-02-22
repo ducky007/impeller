@@ -13,8 +13,8 @@ public protocol Repositable {
     var metadata: Metadata { get set }
     static var repositedType: RepositedType { get }
     
-    init(readingFrom repository:PropertyReader)
-    mutating func write(in repository:PropertyWriter)
+    init(readingFrom reader:PropertyReader)
+    mutating func write(to writer:PropertyWriter)
     
     func resolvedValue(forConflictWith newValue:Repositable, context: Any?) -> Self
 }

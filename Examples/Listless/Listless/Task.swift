@@ -19,16 +19,16 @@ struct Task: Repositable, Equatable {
     
     init() {}
     
-    init(readingFrom repository:PropertyReader) {
-        text = repository.read(Key.text.rawValue)!
-        tagList = repository.read(Key.tagList.rawValue)!
-        isComplete = repository.read(Key.isComplete.rawValue)!
+    init(readingFrom reader:PropertyReader) {
+        text = reader.read(Key.text.rawValue)!
+        tagList = reader.read(Key.tagList.rawValue)!
+        isComplete = reader.read(Key.isComplete.rawValue)!
     }
     
-    mutating func write(in repository:PropertyWriter) {
-        repository.write(text, for: Key.text.rawValue)
-        repository.write(&tagList, for: Key.tagList.rawValue)
-        repository.write(isComplete, for: Key.isComplete.rawValue)
+    mutating func write(to writer:PropertyWriter) {
+        writer.write(text, for: Key.text.rawValue)
+        writer.write(&tagList, for: Key.tagList.rawValue)
+        writer.write(isComplete, for: Key.isComplete.rawValue)
     }
     
     enum Key: String {

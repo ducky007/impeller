@@ -25,12 +25,12 @@ struct TagList: Repositable, Equatable {
         tags = Array(Set(newTags)).sorted()
     }
     
-    init(readingFrom repository:PropertyReader) {
-        tags = repository.read(Key.tags.rawValue)!
+    init(readingFrom reader:PropertyReader) {
+        tags = reader.read(Key.tags.rawValue)!
     }
     
-    mutating func write(in repository:PropertyWriter) {
-        repository.write(tags, for: Key.tags.rawValue)
+    mutating func write(to writer:PropertyWriter) {
+        writer.write(tags, for: Key.tags.rawValue)
     }
     
     enum Key: String {
