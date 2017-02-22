@@ -6,6 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Plaforms](https://img.shields.io/badge/Platforms-Linux%20%7C%20macOS%20%7C%20iOS%20%7C%20WatichOS%20%7C%20tvOS-lightgrey.svg)
 
+Introductory Video: [The Value in Trees (from dotSwift 2017)](http://www.thedotpost.com/2017/01/drew-mccormack-the-value-in-trees)
+
 Impeller is a Distributed Value Store (DVS) written in Swift. It was inspired by successful Distributed Version Control Systems (DVCSes) like Git and Mercurial, and appropriates the concept and terminology for use with application data, rather than source code files.
 
 With Impeller, you compose a data model from Swift value types (`struct`s), and persist them locally in a store like SQlite. Values can be _pushed_ to services like CloudKit, and _pulled_ down to other devices, to facilitate sync across devices, and with web apps.
