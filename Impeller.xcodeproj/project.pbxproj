@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0703684B1E3E1B6200C24E80 /* CloudKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0703684A1E3E1B6200C24E80 /* CloudKitTests.swift */; };
+		07052ACF1E5E00DF0096FC42 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07052ACE1E5E00DF0096FC42 /* History.swift */; };
 		0707B4301DF9DDC300FE8F40 /* Parent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B42F1DF9DDC300FE8F40 /* Parent.swift */; };
 		0707B4321DF9DE0F00FE8F40 /* Child.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4311DF9DE0F00FE8F40 /* Child.swift */; };
 		0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4331DFDBA8E00FE8F40 /* Exchange.swift */; };
@@ -83,6 +84,7 @@
 /* Begin PBXFileReference section */
 		070368481E3E177800C24E80 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		0703684A1E3E1B6200C24E80 /* CloudKitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitTests.swift; sourceTree = "<group>"; };
+		07052ACE1E5E00DF0096FC42 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		0707B42F1DF9DDC300FE8F40 /* Parent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parent.swift; sourceTree = "<group>"; };
 		0707B4311DF9DE0F00FE8F40 /* Child.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Child.swift; sourceTree = "<group>"; };
 		0707B4331DFDBA8E00FE8F40 /* Exchange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Exchange.swift; sourceTree = "<group>"; };
@@ -164,6 +166,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		07052ACB1E5DFF5F0096FC42 /* Versioning */ = {
+			isa = PBXGroup;
+			children = (
+				07052ACE1E5E00DF0096FC42 /* History.swift */,
+			);
+			name = Versioning;
+			sourceTree = "<group>";
+		};
 		071B35C01E16EA3B00781F99 /* Value Trees */ = {
 			isa = PBXGroup;
 			children = (
@@ -274,6 +284,7 @@
 				077F2A001E43C6BE00A1FF59 /* Log.swift */,
 				071B35C11E16EA5600781F99 /* Repositables */,
 				071B35C01E16EA3B00781F99 /* Value Trees */,
+				07052ACB1E5DFF5F0096FC42 /* Versioning */,
 				071B35C21E16EA7C00781F99 /* Local Repositories */,
 				0772A0991E3A1B43008E85C8 /* Remote Repositories */,
 				0772A0981E3A1B29008E85C8 /* Forest Serializers */,
@@ -535,6 +546,7 @@
 				071B35AF1E15273E00781F99 /* CloudKitRepository.swift in Sources */,
 				0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */,
 				07AB7AE11E473EF10025A33B /* Forest.swift in Sources */,
+				07052ACF1E5E00DF0096FC42 /* History.swift in Sources */,
 				0737AB051DF9530C00ABBA90 /* MonolithicRepository.swift in Sources */,
 				073CB7CD1E02F29200E567D7 /* ValueTreePlanter.swift in Sources */,
 				077F2A011E43C6BE00A1FF59 /* Log.swift in Sources */,
