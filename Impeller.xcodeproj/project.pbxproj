@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0703684B1E3E1B6200C24E80 /* CloudKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0703684A1E3E1B6200C24E80 /* CloudKitTests.swift */; };
 		07052ACF1E5E00DF0096FC42 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07052ACE1E5E00DF0096FC42 /* History.swift */; };
+		07052ADF1E63559E0096FC42 /* Commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07052ADE1E63559D0096FC42 /* Commit.swift */; };
 		0707B4301DF9DDC300FE8F40 /* Parent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B42F1DF9DDC300FE8F40 /* Parent.swift */; };
 		0707B4321DF9DE0F00FE8F40 /* Child.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4311DF9DE0F00FE8F40 /* Child.swift */; };
 		0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4331DFDBA8E00FE8F40 /* Exchange.swift */; };
@@ -85,6 +86,7 @@
 		070368481E3E177800C24E80 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		0703684A1E3E1B6200C24E80 /* CloudKitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitTests.swift; sourceTree = "<group>"; };
 		07052ACE1E5E00DF0096FC42 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
+		07052ADE1E63559D0096FC42 /* Commit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Commit.swift; sourceTree = "<group>"; };
 		0707B42F1DF9DDC300FE8F40 /* Parent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parent.swift; sourceTree = "<group>"; };
 		0707B4311DF9DE0F00FE8F40 /* Child.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Child.swift; sourceTree = "<group>"; };
 		0707B4331DFDBA8E00FE8F40 /* Exchange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Exchange.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 		07052ACB1E5DFF5F0096FC42 /* Versioning */ = {
 			isa = PBXGroup;
 			children = (
+				07052ADE1E63559D0096FC42 /* Commit.swift */,
 				07052ACE1E5E00DF0096FC42 /* History.swift */,
 			);
 			name = Versioning;
@@ -541,6 +544,7 @@
 				07AB7AE31E473F340025A33B /* TimestampCursor.swift in Sources */,
 				07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */,
 				071B35BD1E16952400781F99 /* Property.swift in Sources */,
+				07052ADF1E63559E0096FC42 /* Commit.swift in Sources */,
 				0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */,
 				073D51981E54D2F50059CFD9 /* ValueTreeHarvester.swift in Sources */,
 				071B35AF1E15273E00781F99 /* CloudKitRepository.swift in Sources */,
