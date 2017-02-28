@@ -44,17 +44,55 @@ struct History {
         return newCommit
     }
  
-    @discardableResult mutating func mergeHead(with otherHeads: Set<CommitIdentifier>) -> Commit {
-        precondition(otherHeads.isSubset(of: otherRepositoryHeads))
-        let allParents: Set<CommitIdentifier> = {
-            var result = otherHeads
-            if let repositoryHead = repositoryHead { result.insert(repositoryHead) }
-            return result
-        }()
-        let newCommit = Commit(parentCommitIdentifiers: allParents, repositoryIdentifier: repositoryIdentifier)
+    @discardableResult mutating func merge(_ otherHead: CommitIdentifier) -> Commit {
+        precondition(otherRepositoryHeads.contains(otherHead))
+        var parents: Set<CommitIdentifier> = [otherHead]
+        if let repositoryHead = repositoryHead { parents.insert(repositoryHead) }
+        let newCommit = Commit(parentCommitIdentifiers: parents, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
-        allParents.forEach { heads.remove($0) }
+        parents.forEach { heads.remove($0) }
         heads.insert(newCommit.identifier)
         return newCommit
+    }
+    
+    func greatestCommonAncestor(ofCommitsIdentifiedBy commitIdentifiers: (CommitIdentifier, CommitIdentifier)) -> CommitIdentifier? {
+        // Find all ancestors of first commit. Determine how many generations back each commit is.
+        // We take the shortest path to any given commit, ie, the minimum of possible paths.
+        var generationById = [CommitIdentifier:Int]()
+        var frontline: Set<CommitIdentifier> = [commitIdentifiers.0]
+        var generation = 0
+        while frontline.count > 0 {
+            frontline.forEach { generationById[$0] = min(generationById[$0] ?? Int.max, generation) }
+            
+            // Update frontline by going back a generation for each commit
+            var newFrontLine = Set<CommitIdentifier>()
+            for ancestorIdentifier in frontline {
+                let commit = self.commit(with: ancestorIdentifier)!
+                newFrontLine.formUnion(commit.parentCommitIdentifiers)
+            }
+            frontline = newFrontLine
+            
+            // Increment generation
+            generation += 1
+        }
+        
+        // Now go through ancestors of second until we find the first in common with the first ancestors
+        frontline = [commitIdentifiers.1]
+        let ancestorsOfFirst = Set(generationById.keys)
+        while frontline.count > 0 {
+            let common = ancestorsOfFirst.intersection(frontline)
+            let sorted = common.sorted { generationById[$0]! < generationById[$1]! }
+            if let mostRecentCommon = sorted.first { return mostRecentCommon }
+            
+            // Move back a generation
+            var newFrontLine = Set<CommitIdentifier>()
+            for ancestorIdentifier in frontline {
+                let commit = self.commit(with: ancestorIdentifier)!
+                newFrontLine.formUnion(commit.parentCommitIdentifiers)
+            }
+            frontline = newFrontLine
+        }
+        
+        return nil
     }
 }
