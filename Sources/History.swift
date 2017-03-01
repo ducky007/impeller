@@ -36,21 +36,20 @@ struct History {
     }
     
     @discardableResult mutating func commitNewHead() -> Commit {
-        let parents: Set<CommitIdentifier> = repositoryHead != nil ? [repositoryHead!] : []
-        let newCommit = Commit(parentCommitIdentifiers: parents, repositoryIdentifier: repositoryIdentifier)
+        let parentage = repositoryHead != nil ? CommitParentage(parent: repositoryHead!) : nil
+        let newCommit = Commit(parentage: parentage, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
-        heads.subtract(parents)
+        if let parentage = parentage { heads.subtract(parentage.parentIdentifiers) }
         heads.insert(newCommit.identifier)
         return newCommit
     }
  
     @discardableResult mutating func merge(_ otherHead: CommitIdentifier) -> Commit {
         precondition(otherRepositoryHeads.contains(otherHead))
-        var parents: Set<CommitIdentifier> = [otherHead]
-        if let repositoryHead = repositoryHead { parents.insert(repositoryHead) }
-        let newCommit = Commit(parentCommitIdentifiers: parents, repositoryIdentifier: repositoryIdentifier)
+        let parentage = CommitParentage(parent: otherHead, otherParent: repositoryHead)
+        let newCommit = Commit(parentage: parentage, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
-        parents.forEach { heads.remove($0) }
+        parentage.parentIdentifiers.forEach { heads.remove($0) }
         heads.insert(newCommit.identifier)
         return newCommit
     }
@@ -68,7 +67,7 @@ struct History {
             var newFrontLine = Set<CommitIdentifier>()
             for ancestorIdentifier in frontline {
                 let commit = self.commit(with: ancestorIdentifier)!
-                newFrontLine.formUnion(commit.parentCommitIdentifiers)
+                newFrontLine.formUnion(commit.parentage?.parentIdentifiers ?? [])
             }
             frontline = newFrontLine
             
@@ -88,7 +87,7 @@ struct History {
             var newFrontLine = Set<CommitIdentifier>()
             for ancestorIdentifier in frontline {
                 let commit = self.commit(with: ancestorIdentifier)!
-                newFrontLine.formUnion(commit.parentCommitIdentifiers)
+                newFrontLine.formUnion(commit.parentage?.parentIdentifiers ?? [])
             }
             frontline = newFrontLine
         }
