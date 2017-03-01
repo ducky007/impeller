@@ -8,8 +8,8 @@
 
 import Foundation
 
-typealias CommitIdentifier=String
-typealias RepositoryIdentifier=String
+public typealias CommitIdentifier=String
+public typealias RepositoryIdentifier=String
 
 struct CommitParentage {
     let parent: CommitIdentifier

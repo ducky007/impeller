@@ -26,7 +26,7 @@ struct History {
         self.repositoryIdentifier = repositoryIdentifier
     }
     
-    func commit(with identifier: CommitIdentifier) -> Commit? {
+    func fetchCommit(_ identifier: CommitIdentifier) -> Commit? {
         return commitsByIdentifier[identifier]
     }
     

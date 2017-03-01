@@ -51,7 +51,7 @@ public class JSONForestSerializer: ForestSerializer {
 extension ValueTree: JSONRepresentable {
     
     public enum JSONKey: String {
-        case metadata, repositedType, uniqueIdentifier, commitTimestamp, isDeleted, version, propertiesByName
+        case metadata, repositedType, uniqueIdentifier, commitIdentifier, isDeleted, propertiesByName, timestampsByPropertyName
     }
     
     public init(withJSONRepresentation json: Any) throws {
@@ -63,16 +63,16 @@ extension ValueTree: JSONRepresentable {
             let metadataDict = json[JSONKey.metadata.rawValue] as? [String:Any],
             let id = metadataDict[JSONKey.uniqueIdentifier.rawValue] as? String,
             let repositedType = metadataDict[JSONKey.repositedType.rawValue] as? RepositedType,
-            let timestamp = metadataDict[JSONKey.commitTimestamp.rawValue] as? TimeInterval,
-            let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool,
-            let version = metadataDict[JSONKey.version.rawValue] as? RepositedVersion else {
+            let commitIdentifier = metadataDict[JSONKey.commitIdentifier.rawValue] as? CommitIdentifier,
+            let timestampsByPropertyName = metadataDict[JSONKey.timestampsByPropertyName.rawValue] as? [String:TimeInterval],
+            let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool else {
             throw JSONSerializationError.invalidMetadata
         }
         
         var metadata = Metadata(uniqueIdentifier: id)
-        metadata.commitTimestamp = timestamp
+        metadata.commitIdentifier = commitIdentifier
         metadata.isDeleted = isDeleted
-        metadata.version = version
+        metadata.timestampsByPropertyName = timestampsByPropertyName
         
         self.repositedType = repositedType
         self.metadata = metadata
@@ -90,9 +90,9 @@ extension ValueTree: JSONRepresentable {
         let metadataDict: [String:Any] = [
             JSONKey.repositedType.rawValue : repositedType,
             JSONKey.uniqueIdentifier.rawValue : metadata.uniqueIdentifier,
-            JSONKey.commitTimestamp.rawValue : metadata.commitTimestamp,
+            JSONKey.commitIdentifier.rawValue : metadata.commitIdentifier!,
             JSONKey.isDeleted.rawValue : metadata.isDeleted,
-            JSONKey.version.rawValue : metadata.version
+            JSONKey.timestampsByPropertyName.rawValue : metadata.timestampsByPropertyName
         ]
         json[JSONKey.metadata.rawValue] = metadataDict
         json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { _, property in
@@ -107,7 +107,7 @@ extension ValueTree: JSONRepresentable {
 extension Property: JSONRepresentable {
     
     public enum JSONKey: String {
-        case propertyType, primitiveType, value, referencedType, referencedIdentifier, referencedIdentifiers
+        case propertyType, primitiveType, value, referencedType, referencedIdentifier, referencedIdentifiers, referencedCommits, referencedCommitIdentifier
     }
     
     public init(withJSONRepresentation json: Any) throws {
@@ -187,10 +187,12 @@ extension Property: JSONRepresentable {
             else {
                 guard
                     let referencedType = json[JSONKey.referencedType.rawValue] as? String,
-                    let referencedIdentifiers = json[JSONKey.referencedIdentifiers.rawValue] as? [String] else {
+                    let referencedIdentifiers = json[JSONKey.referencedIdentifiers.rawValue] as? [String],
+                    let referencedCommitIdentifiers = json[JSONKey.referencedCommits.rawValue] as? [String] else {
                     throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
                 }
-                let refs = referencedIdentifiers.map { ValueTreeReference(uniqueIdentifier: $0, repositedType: referencedType) }
+                let idCommitTuples = zip(referencedIdentifiers, referencedCommitIdentifiers)
+                let refs = idCommitTuples.map { ValueTreeReference(uniqueIdentifier: $0.0, repositedType: referencedType, commitIdentifier: $0.1) }
                 self = .valueTreeReferences(refs)
             }
         }
@@ -219,10 +221,11 @@ extension Property: JSONRepresentable {
     private init(withReferenceDictionary dict: [String:Any]) throws {
         guard
             let referencedType = dict[JSONKey.referencedType.rawValue] as? String,
-            let referencedIdentifier = dict[JSONKey.referencedIdentifier.rawValue] as? String else {
+            let referencedIdentifier = dict[JSONKey.referencedIdentifier.rawValue] as? String,
+            let commitIdentifier = dict[JSONKey.referencedCommitIdentifier.rawValue] as? String else {
                 throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
         }
-        let ref = ValueTreeReference(uniqueIdentifier: referencedIdentifier, repositedType: referencedType)
+        let ref = ValueTreeReference(uniqueIdentifier: referencedIdentifier, repositedType: referencedType, commitIdentifier: commitIdentifier)
         self = .valueTreeReference(ref)
     }
     
