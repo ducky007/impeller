@@ -6,19 +6,17 @@
 //  Copyright © 2016 Drew McCormack. All rights reserved.
 //
 
-import Foundation
-
-
 /// All data is in memory. This class does not persist data to disk,
 /// but other classes can be used to do that.
 public class MonolithicRepository: LocalRepository, Exchangable {
     public var uniqueIdentifier: UniqueIdentifier = uuid()
     private let queue = DispatchQueue(label: "impeller.monolithicRepository")
     private var forest = Forest()
+    private var history: History
     
-    private var commitTimestamp = Date.distantPast.timeIntervalSinceReferenceDate
-
-    public init() {}
+    public init() {
+        history = History(repositoryIdentifier: uniqueIdentifier)
+    }
     
     public func load(from url:URL, with serializer: ForestSerializer) throws {
         try queue.sync {
@@ -45,6 +43,8 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         let commitForest = planter.forest
         let rootRef = ValueTreePlanter(repositable: value).valueTree.valueTreeReference
         let plantedTree = PlantedValueTree(forest: commitForest, root: rootRef)
+        
+        // Commit
     
         // Merge into forest
         forest.merge(plantedTree, resolvingConflictsWith: conflictResolver)

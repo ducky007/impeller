@@ -35,21 +35,27 @@ final class ValueTreePlanter<T:Repositable>: PropertyWriter {
     }
     
     func write<PropertyType:Repositable>(_ value:inout PropertyType, for key:String) {
-        let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType)
+        let reference = ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType, commitIdentifier: value.metadata.commitIdentifier)
         valueTree.set(key, to: .valueTreeReference(reference))
         forestPlanter?.processChild(value)
     }
     
     func write<PropertyType:Repositable>(_ value:inout PropertyType?, for key:String) {
-        let id = value?.metadata.uniqueIdentifier
-        let reference = id != nil ? ValueTreeReference(uniqueIdentifier: id!, repositedType: PropertyType.repositedType) : nil
+        let reference: ValueTreeReference? = {
+            if let value = value {
+                return ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType, commitIdentifier: value.metadata.commitIdentifier)
+            }
+            else {
+                return nil
+            }
+        }()
         valueTree.set(key, to: .optionalValueTreeReference(reference))
         if let value = value { forestPlanter?.processChild(value) }
     }
     
     func write<PropertyType:Repositable>(_ values:inout [PropertyType], for key:String) {
-        let references = values.map {
-            ValueTreeReference(uniqueIdentifier: $0.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType)
+        let references = values.map { value in
+            ValueTreeReference(uniqueIdentifier: value.metadata.uniqueIdentifier, repositedType: PropertyType.repositedType, commitIdentifier: value.metadata.commitIdentifier)
         }
         valueTree.set(key, to: .valueTreeReferences(references))
         values.forEach { forestPlanter?.processChild($0) }

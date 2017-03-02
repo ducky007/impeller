@@ -24,7 +24,7 @@ struct CommitParentage {
     }
 }
 
-struct Commit {
+public struct Commit {
     let identifier: CommitIdentifier
     let parentage: CommitParentage?
     let timestamp: TimeInterval

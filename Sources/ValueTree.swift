@@ -12,7 +12,7 @@ public struct ValueTreeReference: Equatable, Hashable {
     let repositedType: RepositedType
     let commitIdentifier: CommitIdentifier?
     
-    public init(uniqueIdentifier: UniqueIdentifier, repositedType: RepositedType, commitIdentifier: CommitIdentifier? = nil) {
+    public init(uniqueIdentifier: UniqueIdentifier, repositedType: RepositedType, commitIdentifier: CommitIdentifier?) {
         self.uniqueIdentifier = uniqueIdentifier
         self.repositedType = repositedType
         self.commitIdentifier = commitIdentifier

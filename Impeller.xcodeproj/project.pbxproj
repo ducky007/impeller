@@ -289,7 +289,7 @@
 				071B35C01E16EA3B00781F99 /* Value Trees */,
 				07052ACB1E5DFF5F0096FC42 /* Versioning */,
 				071B35C21E16EA7C00781F99 /* Local Repositories */,
-				0772A0991E3A1B43008E85C8 /* Remote Repositories */,
+				0772A0991E3A1B43008E85C8 /* Recent Value Stores */,
 				0772A0981E3A1B29008E85C8 /* Forest Serializers */,
 				071B35C31E16EA8D00781F99 /* Exchange */,
 				0737AAE81DF9524D00ABBA90 /* Info.plist */,
@@ -320,12 +320,12 @@
 			name = "Forest Serializers";
 			sourceTree = "<group>";
 		};
-		0772A0991E3A1B43008E85C8 /* Remote Repositories */ = {
+		0772A0991E3A1B43008E85C8 /* Recent Value Stores */ = {
 			isa = PBXGroup;
 			children = (
 				071B35AE1E15273E00781F99 /* CloudKitRepository.swift */,
 			);
-			name = "Remote Repositories";
+			name = "Recent Value Stores";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

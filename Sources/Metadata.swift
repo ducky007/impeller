@@ -18,9 +18,11 @@ public struct Metadata: Equatable {
     }
         
     public let uniqueIdentifier: UniqueIdentifier
-    public internal(set) var commitIdentifier: CommitIdentifier?
-    public internal(set) var isDeleted: Bool
     public var timestampsByPropertyName = [String:TimeInterval]()
+    
+    internal var ancestry: [UniqueIdentifier]?
+    internal var commitIdentifier: CommitIdentifier?
+    internal var isDeleted: Bool
     
     public init(uniqueIdentifier: UniqueIdentifier = UUID().uuidString) {
         self.uniqueIdentifier = uniqueIdentifier

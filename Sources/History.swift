@@ -66,7 +66,7 @@ struct History {
             // Update frontline by going back a generation for each commit
             var newFrontLine = Set<CommitIdentifier>()
             for ancestorIdentifier in frontline {
-                let commit = self.commit(with: ancestorIdentifier)!
+                let commit = self.fetchCommit(ancestorIdentifier)!
                 newFrontLine.formUnion(commit.parentage?.parentIdentifiers ?? [])
             }
             frontline = newFrontLine
@@ -86,7 +86,7 @@ struct History {
             // Move back a generation
             var newFrontLine = Set<CommitIdentifier>()
             for ancestorIdentifier in frontline {
-                let commit = self.commit(with: ancestorIdentifier)!
+                let commit = self.fetchCommit(ancestorIdentifier)!
                 newFrontLine.formUnion(commit.parentage?.parentIdentifiers ?? [])
             }
             frontline = newFrontLine
