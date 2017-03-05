@@ -11,28 +11,25 @@ import Foundation
 public typealias CommitIdentifier=String
 public typealias RepositoryIdentifier=String
 
-struct CommitParentage {
-    let parent: CommitIdentifier
-    let otherParent: CommitIdentifier?
-    var parentIdentifiers: [CommitIdentifier] {
-        return [parent] + (otherParent != nil ? [otherParent!] : [])
-    }
+struct CommitLineage {
+    let predecessorIdentifier: CommitIdentifier
+    let mergedPredecessorIdentifier: CommitIdentifier?
     
     init(parent: CommitIdentifier, otherParent: CommitIdentifier? = nil) {
-        self.parent = parent
-        self.otherParent = otherParent
+        self.predecessorIdentifier = parent
+        self.mergedPredecessorIdentifier = otherParent
     }
 }
 
 public struct Commit {
     let identifier: CommitIdentifier
-    let parentage: CommitParentage?
+    let lineage: CommitLineage?
     let timestamp: TimeInterval
     let repositoryIdentifier: RepositoryIdentifier
     
-    init(identifier: CommitIdentifier = UUID().uuidString, parentage: CommitParentage?, timestamp: TimeInterval = Date().timeIntervalSinceReferenceDate, repositoryIdentifier: RepositoryIdentifier) {
+    init(identifier: CommitIdentifier = UUID().uuidString, lineage: CommitLineage?, timestamp: TimeInterval = Date().timeIntervalSinceReferenceDate, repositoryIdentifier: RepositoryIdentifier) {
         self.identifier = identifier
-        self.parentage = parentage
+        self.lineage = lineage
         self.timestamp = timestamp
         self.repositoryIdentifier = repositoryIdentifier
     }
