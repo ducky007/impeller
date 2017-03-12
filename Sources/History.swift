@@ -11,16 +11,9 @@ import Foundation
 struct History {
     let repositoryIdentifier: RepositoryIdentifier
     private var commitsByIdentifier: [CommitIdentifier:Commit] = [:]
-    private (set) var heads: Set<CommitIdentifier> = []
-    
-    var repositoryHead: CommitIdentifier? {
-        return heads.filter({ commitsByIdentifier[$0]?.repositoryIdentifier == repositoryIdentifier }).first
-    }
-    
-    var otherRepositoryHeads: Set<CommitIdentifier> {
-        guard  let repositoryHead = repositoryHead else { return heads }
-        return heads.subtracting([repositoryHead])
-    }
+    private (set) var head: CommitIdentifier?                   // Current local head
+    private (set) var detachedHeads: Set<CommitIdentifier> = [] // Local heads branched from past
+    private (set) var remoteHeads: Set<CommitIdentifier> = []   // Heads created remotely
     
     init(repositoryIdentifier: RepositoryIdentifier) {
         self.repositoryIdentifier = repositoryIdentifier
@@ -35,12 +28,32 @@ struct History {
         commitsByIdentifier[commit.identifier] = commit
     }
     
-    @discardableResult mutating func commitNewHead() -> Commit {
-        let parentage = repositoryHead != nil ? CommitParentage(parent: repositoryHead!) : nil
-        let newCommit = Commit(parentage: parentage, repositoryIdentifier: repositoryIdentifier)
+    @discardableResult mutating func commitNewHead(basedOn parentIdentifier: CommitIdentifier?) -> Commit {
+        let lineage = parentIdentifier != nil ? CommitLineage(parent: parentIdentifier!) : nil
+        let newCommit = Commit(lineage: lineage, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
-        if let parentage = parentage { heads.subtract(parentage.parentIdentifiers) }
-        heads.insert(newCommit.identifier)
+        
+        if let parentIdentifier = parentIdentifier {
+            if parentIdentifier == head {
+                // Fast forward existing head
+                head = parentIdentifier
+            }
+            else if detachedHeads.contains(parentIdentifier) {
+                // Extend a detached head
+                detachedHeads.remove(parentIdentifier)
+                detachedHeads.insert(newCommit.identifier)
+            }
+            else {
+                // Add a new detached head
+                detachedHeads.insert(newCommit.identifier)
+            }
+        }
+        else {
+            // First commit
+            assert(head == nil)
+            head = newCommit.identifier
+        }
+
         return newCommit
     }
  
