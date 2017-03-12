@@ -9,43 +9,36 @@
 import Foundation
 
 public struct ForestRanger: IteratorProtocol {
-    public typealias Element = ValueTreeReference
+    public typealias Element = ValueTreePath
     
     public let plantedValueTree: PlantedValueTree
-    private var visitationList: [ValueTreeReference] = []
+    
+    private var visitationList: [ValueTreePath] = []
     private var index = -1
     
     init(plantedValueTree: PlantedValueTree) {
         self.plantedValueTree = plantedValueTree
-        visitationList = visitationList(forTreeAt: plantedValueTree.root)
+        
+        let rootPath = ValueTreePath(pathFromRoot: [plantedValueTree.root])
+        visitationList = visitationList(forTreeAt: rootPath)
     }
     
-    public mutating func next() -> ValueTreeReference? {
+    public mutating func next() -> ValueTreePath? {
         index += 1
         guard index < visitationList.count else { return nil }
         return visitationList[index]
     }
     
-    private func visitationList(forTreeAt reference: ValueTreeReference) -> [ValueTreeReference] {
-        guard let valueTree = plantedValueTree.forest.valueTree(at: reference) else { return [] }
+    private func visitationList(forTreeAt path: ValueTreePath) -> [ValueTreePath] {
+        guard let treeRef = path.pathFromRoot.last, let valueTree = plantedValueTree.forest.valueTree(at: treeRef) else { return [] }
         
-        var children: [ValueTreeReference] = []
-        for (_, property) in valueTree.propertiesByName {
-            switch property {
-            case .optionalValueTreeReference(let ref?), .valueTreeReference(let ref):
-                children.append(ref)
-            case .valueTreeReferences(let refs):
-                children.append(contentsOf: refs)
-            default:
-                break
-            }
+        let childRefs = valueTree.childReferences
+        var childDescendentPaths: [ValueTreePath] = []
+        for childRef in childRefs {
+            let childPath = path.appending(childRef)
+            childDescendentPaths.append(contentsOf: visitationList(forTreeAt: childPath))
         }
         
-        var childDescendents: [ValueTreeReference] = []
-        for childRef in children {
-            childDescendents.append(contentsOf: visitationList(forTreeAt: childRef))
-        }
-        
-        return [reference] + childDescendents
+        return [path] + childDescendentPaths
     }
 }

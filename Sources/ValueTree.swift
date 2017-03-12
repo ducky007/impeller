@@ -10,7 +10,7 @@
 public struct ValueTreeReference: Equatable, Hashable {
     let uniqueIdentifier: UniqueIdentifier
     let repositedType: RepositedType
-    let commitIdentifier: CommitIdentifier?
+    let commitIdentifier: CommitIdentifier? // Can be nil if not yet committed to repository
     
     public init(uniqueIdentifier: UniqueIdentifier, repositedType: RepositedType, commitIdentifier: CommitIdentifier?) {
         self.uniqueIdentifier = uniqueIdentifier
@@ -28,6 +28,35 @@ public struct ValueTreeReference: Equatable, Hashable {
     
     public var asString: String {
         return "\(repositedType)__\(uniqueIdentifier)__\(commitIdentifier)"
+    }
+}
+
+
+/// A path to a specific value tree. The reference of the
+/// tree itself is last in the list. The root tree is first in the
+/// list.
+public struct ValueTreePath {
+    public let pathFromRoot: [ValueTreeReference]
+    
+    public var valueTreeReference: ValueTreeReference {
+        return pathFromRoot.last!
+    }
+    
+    public var rootReference: ValueTreeReference {
+        return pathFromRoot.first!
+    }
+    
+    public var ancestorReferences: [ValueTreeReference] {
+        return Array(pathFromRoot.dropLast(1))
+    }
+    
+    public init(pathFromRoot: [ValueTreeReference]) {
+        assert(pathFromRoot.count > 0)
+        self.pathFromRoot = pathFromRoot
+    }
+    
+    public func appending(_ component: ValueTreeReference) -> ValueTreePath {
+        return ValueTreePath(pathFromRoot: pathFromRoot + [component])
     }
 }
 
@@ -56,6 +85,39 @@ public struct ValueTree: Equatable, Hashable {
     
     public mutating func set(_ propertyName: String, to property: Property) {
         propertiesByName[propertyName] = property
+    }
+    
+    public mutating func updateChildReferences(with block: (ValueTreeReference)->ValueTreeReference) {
+        for (name, property) in propertiesByName {
+            switch property {
+            case .optionalValueTreeReference(let ref?):
+                let newRef = block(ref)
+                propertiesByName[name] = .optionalValueTreeReference(newRef)
+            case .valueTreeReference(let ref):
+                let newRef = block(ref)
+                propertiesByName[name] = .valueTreeReference(newRef)
+            case .valueTreeReferences(let refs):
+                let newRefs = refs.map(block)
+                propertiesByName[name] = .valueTreeReferences(newRefs)
+            default:
+                break
+            }
+        }
+    }
+    
+    public var childReferences: Set<ValueTreeReference> {
+        var references: Set<ValueTreeReference> = []
+        for (_, property) in propertiesByName {
+            switch property {
+            case .optionalValueTreeReference(let ref?), .valueTreeReference(let ref):
+                references.insert(ref)
+            case .valueTreeReferences(let refs):
+                references.formUnion(refs)
+            default:
+                break
+            }
+        }
+        return references
     }
     
     public var hashValue: Int {

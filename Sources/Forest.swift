@@ -9,9 +9,9 @@
 import Foundation
 
 public class ConflictResolver {
-    func resolved(fromConflictOf valueTree: ValueTree, with otherValueTree: ValueTree) -> ValueTree {
-        return valueTree.metadata.commitTimestamp >= otherValueTree.metadata.commitTimestamp ? valueTree : otherValueTree
-    }
+//    func resolved(fromConflictOf valueTree: ValueTree, with otherValueTree: ValueTree) -> ValueTree {
+//        return valueTree.metadata.commitTimestamp >= otherValueTree.metadata.commitTimestamp ? valueTree : otherValueTree
+//    }
 }
 
 
@@ -43,13 +43,21 @@ public struct Forest: Sequence {
         }
     }
     
+    public mutating func insertValueTrees(descendentFrom root: PlantedValueTree) {
+        let rootForest = root.forest
+        for treeRef in root {
+            let tree = rootForest.valueTree(at: treeRef)!
+            update(tree)
+        }
+    }
+    
     public mutating func deleteValueTrees(descendentFrom reference: ValueTreeReference) {
         let timestamp = Date.timeIntervalSinceReferenceDate
         let plantedTree = PlantedValueTree(forest: self, root: reference)
         for ref in plantedTree {
             var tree = valueTree(at: ref)!
             tree.metadata.isDeleted = true
-            tree.metadata.commitTimestamp = timestamp
+//            tree.metadata.commitTimestamp = timestamp
             update(tree)
         }
     }

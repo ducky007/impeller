@@ -38,13 +38,46 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     }
     
     private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver) {
-        // Plant new values
+        // Plant new values in a temporary commit forest
         let planter = ForestPlanter(withRoot: value)
-        let commitForest = planter.forest
-        let rootRef = ValueTreePlanter(repositable: value).valueTree.valueTreeReference
-        let plantedTree = PlantedValueTree(forest: commitForest, root: rootRef)
+        var commitForest = planter.forest
+        let plantedTree = PlantedValueTree(forest: commitForest, root: planter.rootReference)
+        let newCommitIdentifier = UUID().uuidString
         
-        // Get planted tree as fetched
+        // Get tree from our forest, as it was fetched.
+        // If the tree is new, set commit ids on all descendants, 
+        // and commit it directly to our forest
+        guard let fetchedTree = forest.valueTree(at: planter.rootReference) else {
+            var finalizedForest = Forest()
+            
+            // Create new trees
+            for path in plantedTree {
+                var tree = plantedTree.forest.valueTree(at: path.valueTreeReference)!
+                
+                // Update child refs to inlcude the commit id
+                tree.updateChildReferences {
+                    ValueTreeReference(uniqueIdentifier: $0.uniqueIdentifier, repositedType: $0.repositedType, commitIdentifier: newCommitIdentifier)
+                }
+                
+                // Update metadata
+                var newMetadata = tree.metadata
+                newMetadata.commitIdentifier = newCommitIdentifier
+                newMetadata.ancestry = path.ancestorReferences.map { $0.uniqueIdentifier }
+                tree.metadata = newMetadata
+                
+                finalizedForest.update(tree)
+            }
+            
+            // New root reference
+            let oldRootRef = plantedTree.root
+            let rootRef = ValueTreeReference(uniqueIdentifier: oldRootRef.uniqueIdentifier, repositedType: oldRootRef.repositedType, commitIdentifier: newCommitIdentifier)
+            
+            // Insert new value trees
+            let newPlantedTree = PlantedValueTree(forest: finalizedForest, root: rootRef)
+            forest.insertValueTrees(descendentFrom: newPlantedTree)
+            
+            return
+        }
         
         // Determine which value trees have changed, and which should be deleted
         
@@ -60,7 +93,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         let harvester = ForestHarvester(forest: forest)
         value = harvester.harvest(newValueTree)
     }
-    
+        
     public func delete<T:Repositable>(_ root: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         queue.sync {
             // First merge in-memory and repo values, then delete

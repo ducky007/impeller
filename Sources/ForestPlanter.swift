@@ -11,9 +11,11 @@ import Foundation
 /// Makes a forest from a tree of Repositables
 final class ForestPlanter {
     
-    var forest = Forest()
+    private(set) var forest = Forest()
+    let rootReference: ValueTreeReference
     
     init<T:Repositable>(withRoot root:T) {
+        rootReference = ValueTreePlanter(repositable: root).valueTree.valueTreeReference
         plant(withRoot: root)
     }
     
