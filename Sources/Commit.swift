@@ -15,9 +15,17 @@ struct CommitLineage {
     let predecessorIdentifier: CommitIdentifier
     let mergedPredecessorIdentifier: CommitIdentifier?
     
-    init(parent: CommitIdentifier, otherParent: CommitIdentifier? = nil) {
-        self.predecessorIdentifier = parent
-        self.mergedPredecessorIdentifier = otherParent
+    var predecessors: Set<CommitIdentifier> {
+        let merged: [CommitIdentifier] = {
+            guard let id = mergedPredecessorIdentifier else { return [] }
+            return [id]
+        }()
+        return Set<CommitIdentifier>(merged + [predecessorIdentifier])
+    }
+    
+    init(predecessor: CommitIdentifier, mergedPredecessor: CommitIdentifier? = nil) {
+        self.predecessorIdentifier = predecessor
+        self.mergedPredecessorIdentifier = mergedPredecessor
     }
 }
 

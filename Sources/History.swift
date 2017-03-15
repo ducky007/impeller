@@ -8,6 +8,10 @@
 
 import Foundation
 
+enum HistoryError: Error {
+    case mergeError(reason: String)
+}
+
 struct History {
     let repositoryIdentifier: RepositoryIdentifier
     private var commitsByIdentifier: [CommitIdentifier:Commit] = [:]
@@ -23,12 +27,12 @@ struct History {
         return commitsByIdentifier[identifier]
     }
     
-    mutating func add(_ commit: Commit) {
+    private mutating func add(_ commit: Commit) {
         precondition(commitsByIdentifier[commit.identifier] == nil)
         commitsByIdentifier[commit.identifier] = commit
     }
     
-    @discardableResult mutating func commitNewHead(basedOn parentIdentifier: CommitIdentifier?) -> Commit {
+    @discardableResult mutating func commitHead(basedOn parentIdentifier: CommitIdentifier?) -> Commit {
         let lineage = parentIdentifier != nil ? CommitLineage(parent: parentIdentifier!) : nil
         let newCommit = Commit(lineage: lineage, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
@@ -36,7 +40,7 @@ struct History {
         if let parentIdentifier = parentIdentifier {
             if parentIdentifier == head {
                 // Fast forward existing head
-                head = parentIdentifier
+                head = newCommit.identifier
             }
             else if detachedHeads.contains(parentIdentifier) {
                 // Extend a detached head
@@ -57,13 +61,22 @@ struct History {
         return newCommit
     }
  
-    @discardableResult mutating func merge(_ otherHead: CommitIdentifier) -> Commit {
-        precondition(otherRepositoryHeads.contains(otherHead))
-        let parentage = CommitParentage(parent: otherHead, otherParent: repositoryHead)
-        let newCommit = Commit(parentage: parentage, repositoryIdentifier: repositoryIdentifier)
+    @discardableResult mutating func merge(_ otherHead: CommitIdentifier) throws -> Commit {
+        guard let head = head else {
+            throw HistoryError.mergeError(reason: "No local head in repo")
+        }
+        guard detachedHeads.contains(otherHead) || remoteHeads.contains(otherHead) else {
+            throw HistoryError.mergeError(reason: "Merge head is not in repository heads list")
+        }
+        
+        let lineage = CommitLineage(predecessor: head, mergedPredecessor: otherHead)
+        let newCommit = Commit(lineage: lineage, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
-        parentage.parentIdentifiers.forEach { heads.remove($0) }
-        heads.insert(newCommit.identifier)
+        
+        remoteHeads.remove(otherHead)
+        detachedHeads.remove(otherHead)
+        self.head = newCommit.identifier
+
         return newCommit
     }
     
@@ -71,38 +84,32 @@ struct History {
         // Find all ancestors of first commit. Determine how many generations back each commit is.
         // We take the shortest path to any given commit, ie, the minimum of possible paths.
         var generationById = [CommitIdentifier:Int]()
-        var frontline: Set<CommitIdentifier> = [commitIdentifiers.0]
-        var generation = 0
-        while frontline.count > 0 {
-            frontline.forEach { generationById[$0] = min(generationById[$0] ?? Int.max, generation) }
-            
-            // Update frontline by going back a generation for each commit
-            var newFrontLine = Set<CommitIdentifier>()
-            for ancestorIdentifier in frontline {
-                let commit = self.fetchCommit(ancestorIdentifier)!
-                newFrontLine.formUnion(commit.parentage?.parentIdentifiers ?? [])
+        var front: Set<CommitIdentifier> = [commitIdentifiers.0]
+        
+        func propagateFront() {
+            var newFront = Set<CommitIdentifier>()
+            for predecessor in front {
+                let commit = self.fetchCommit(predecessor)!
+                newFront.formUnion(commit.lineage?.predecessors ?? [])
             }
-            frontline = newFrontLine
-            
-            // Increment generation
+            front = newFront
+        }
+        
+        var generation = 0
+        while front.count > 0 {
+            front.forEach { generationById[$0] = min(generationById[$0] ?? Int.max, generation) }
+            propagateFront()
             generation += 1
         }
         
         // Now go through ancestors of second until we find the first in common with the first ancestors
-        frontline = [commitIdentifiers.1]
+        front = [commitIdentifiers.1]
         let ancestorsOfFirst = Set(generationById.keys)
-        while frontline.count > 0 {
-            let common = ancestorsOfFirst.intersection(frontline)
+        while front.count > 0 {
+            let common = ancestorsOfFirst.intersection(front)
             let sorted = common.sorted { generationById[$0]! < generationById[$1]! }
             if let mostRecentCommon = sorted.first { return mostRecentCommon }
-            
-            // Move back a generation
-            var newFrontLine = Set<CommitIdentifier>()
-            for ancestorIdentifier in frontline {
-                let commit = self.fetchCommit(ancestorIdentifier)!
-                newFrontLine.formUnion(commit.parentage?.parentIdentifiers ?? [])
-            }
-            frontline = newFrontLine
+            propagateFront()
         }
         
         return nil
