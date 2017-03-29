@@ -112,3 +112,4 @@ public class Exchange {
         cursorsByExchangableIdentifier = newCursors
     }
 }
+

@@ -32,19 +32,20 @@ struct History {
         commitsByIdentifier[commit.identifier] = commit
     }
     
-    @discardableResult mutating func commitHead(basedOn parentIdentifier: CommitIdentifier?) -> Commit {
-        let lineage = parentIdentifier != nil ? CommitLineage(parent: parentIdentifier!) : nil
+    @discardableResult mutating func commitHead(basedOn predecessorIdentifier: CommitIdentifier?) -> Commit {
+        let predecessorToUse = predecessorIdentifier ?? head
+        let lineage = predecessorToUse != nil ? CommitLineage(predecessor: predecessorToUse!) : nil
         let newCommit = Commit(lineage: lineage, repositoryIdentifier: repositoryIdentifier)
         add(newCommit)
         
-        if let parentIdentifier = parentIdentifier {
-            if parentIdentifier == head {
+        if let predecessorToUse = predecessorToUse {
+            if predecessorToUse == head {
                 // Fast forward existing head
                 head = newCommit.identifier
             }
-            else if detachedHeads.contains(parentIdentifier) {
+            else if detachedHeads.contains(predecessorToUse) {
                 // Extend a detached head
-                detachedHeads.remove(parentIdentifier)
+                detachedHeads.remove(predecessorToUse)
                 detachedHeads.insert(newCommit.identifier)
             }
             else {

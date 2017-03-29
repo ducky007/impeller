@@ -12,8 +12,6 @@
 		07052ADF1E63559E0096FC42 /* Commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07052ADE1E63559D0096FC42 /* Commit.swift */; };
 		0707B4301DF9DDC300FE8F40 /* Parent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B42F1DF9DDC300FE8F40 /* Parent.swift */; };
 		0707B4321DF9DE0F00FE8F40 /* Child.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4311DF9DE0F00FE8F40 /* Child.swift */; };
-		0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4331DFDBA8E00FE8F40 /* Exchange.swift */; };
-		071B35AF1E15273E00781F99 /* CloudKitRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071B35AE1E15273E00781F99 /* CloudKitRepository.swift */; };
 		071B35BD1E16952400781F99 /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071B35BC1E16952400781F99 /* Property.swift */; };
 		071B35BF1E16E78300781F99 /* Primitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071B35BE1E16E78300781F99 /* Primitive.swift */; };
 		07251A391E1EC7D700C2CD8C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07251A381E1EC7D700C2CD8C /* CloudKit.framework */; };
@@ -43,8 +41,9 @@
 		0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772A0961E3A1703008E85C8 /* JSONForestSerializer.swift */; };
 		077C8B5F1E01A80B0073B628 /* RepositablePrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077C8B5E1E01A80B0073B628 /* RepositablePrimitive.swift */; };
 		077F2A011E43C6BE00A1FF59 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077F2A001E43C6BE00A1FF59 /* Log.swift */; };
+		07A70FF31E8C230E00007C1F /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4331DFDBA8E00FE8F40 /* Exchange.swift */; };
+		07A70FF41E8C253D00007C1F /* TimestampCursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE21E473F340025A33B /* TimestampCursor.swift */; };
 		07AB7AE11E473EF10025A33B /* Forest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE01E473EF10025A33B /* Forest.swift */; };
-		07AB7AE31E473F340025A33B /* TimestampCursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE21E473F340025A33B /* TimestampCursor.swift */; };
 		07AB7AE51E4740270025A33B /* ForestRanger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE41E4740270025A33B /* ForestRanger.swift */; };
 		07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE61E4A4F010025A33B /* PlantedValueTree.swift */; };
 		07C5C2291E40F3F6009596F4 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5C2281E40F3F6009596F4 /* SerializationTests.swift */; };
@@ -541,13 +540,10 @@
 				07AB7AE51E4740270025A33B /* ForestRanger.swift in Sources */,
 				073D518F1E4CFDD60059CFD9 /* ForestPlanter.swift in Sources */,
 				0737AAFF1DF952A200ABBA90 /* Metadata.swift in Sources */,
-				07AB7AE31E473F340025A33B /* TimestampCursor.swift in Sources */,
 				07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */,
 				071B35BD1E16952400781F99 /* Property.swift in Sources */,
 				07052ADF1E63559E0096FC42 /* Commit.swift in Sources */,
-				0707B4341DFDBA8E00FE8F40 /* Exchange.swift in Sources */,
 				073D51981E54D2F50059CFD9 /* ValueTreeHarvester.swift in Sources */,
-				071B35AF1E15273E00781F99 /* CloudKitRepository.swift in Sources */,
 				0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */,
 				07AB7AE11E473EF10025A33B /* Forest.swift in Sources */,
 				07052ACF1E5E00DF0096FC42 /* History.swift in Sources */,
@@ -560,6 +556,8 @@
 				0737AB071DF9534300ABBA90 /* General.swift in Sources */,
 				073D519A1E54D3040059CFD9 /* ForestHarvester.swift in Sources */,
 				077C8B5F1E01A80B0073B628 /* RepositablePrimitive.swift in Sources */,
+				07A70FF41E8C253D00007C1F /* TimestampCursor.swift in Sources */,
+				07A70FF31E8C230E00007C1F /* Exchange.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

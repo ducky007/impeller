@@ -7,27 +7,44 @@
 //
 
 
-public struct ValueTreeReference: Equatable, Hashable {
+public struct ValueTreeIdentity: Equatable, Hashable {
     let uniqueIdentifier: UniqueIdentifier
     let repositedType: RepositedType
+    
+    public var hashValue: Int {
+        return uniqueIdentifier.hash
+    }
+    
+    public static func ==(left: ValueTreeIdentity, right: ValueTreeIdentity) -> Bool {
+        return left.uniqueIdentifier == right.uniqueIdentifier && left.repositedType == right.repositedType
+    }
+}
+
+
+public struct ValueTreeReference: Equatable, Hashable {
+    let identity: ValueTreeIdentity
     let commitIdentifier: CommitIdentifier? // Can be nil if not yet committed to repository
     
     public init(uniqueIdentifier: UniqueIdentifier, repositedType: RepositedType, commitIdentifier: CommitIdentifier?) {
-        self.uniqueIdentifier = uniqueIdentifier
-        self.repositedType = repositedType
+        self.init(identity: ValueTreeIdentity(uniqueIdentifier: uniqueIdentifier, repositedType: repositedType), commitIdentifier: commitIdentifier)
+    }
+    
+    public init(identity: ValueTreeIdentity, commitIdentifier: CommitIdentifier?) {
+        self.identity = identity
         self.commitIdentifier = commitIdentifier
     }
     
     public var hashValue: Int {
-        return uniqueIdentifier.hash ^ (commitIdentifier?.hash ?? 0)
+        return identity.hashValue ^ (commitIdentifier?.hash ?? 0)
     }
     
     public static func ==(left: ValueTreeReference, right: ValueTreeReference) -> Bool {
-        return left.uniqueIdentifier == right.uniqueIdentifier && left.repositedType == right.repositedType && left.commitIdentifier == right.commitIdentifier
+        return left.identity == right.identity && left.commitIdentifier == right.commitIdentifier
     }
     
     public var asString: String {
-        return "\(repositedType)__\(uniqueIdentifier)__\(commitIdentifier)"
+        let id = identity
+        return "\(id.repositedType)__\(id.uniqueIdentifier)__\(commitIdentifier)"
     }
 }
 

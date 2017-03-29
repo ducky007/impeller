@@ -254,20 +254,20 @@ extension Property: JSONRepresentable {
                 result[JSONKey.primitiveType.rawValue] = 0
             }
         case .valueTreeReference(let ref):
-            result[JSONKey.referencedType.rawValue] = ref.repositedType
-            result[JSONKey.referencedIdentifier.rawValue] = ref.uniqueIdentifier
+            result[JSONKey.referencedType.rawValue] = ref.identity.repositedType
+            result[JSONKey.referencedIdentifier.rawValue] = ref.identity.uniqueIdentifier
         case .optionalValueTreeReference(let ref):
             if let ref = ref {
-                result[JSONKey.referencedType.rawValue] = ref.repositedType
-                result[JSONKey.referencedIdentifier.rawValue] = ref.uniqueIdentifier
+                result[JSONKey.referencedType.rawValue] = ref.identity.repositedType
+                result[JSONKey.referencedIdentifier.rawValue] = ref.identity.uniqueIdentifier
             }
             else {
                 result[JSONKey.referencedType.rawValue] = 0
             }
         case .valueTreeReferences(let refs):
             if refs.count > 0 {
-                result[JSONKey.referencedType.rawValue] = refs.first!.repositedType
-                result[JSONKey.referencedIdentifiers.rawValue] = refs.map { $0.uniqueIdentifier }
+                result[JSONKey.referencedType.rawValue] = refs.first!.identity.repositedType
+                result[JSONKey.referencedIdentifiers.rawValue] = refs.map { $0.identity.uniqueIdentifier }
             }
             else {
                 result[JSONKey.referencedType.rawValue] = 0

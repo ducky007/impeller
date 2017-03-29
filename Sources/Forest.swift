@@ -45,8 +45,8 @@ public struct Forest: Sequence {
     
     public mutating func insertValueTrees(descendentFrom root: PlantedValueTree) {
         let rootForest = root.forest
-        for treeRef in root {
-            let tree = rootForest.valueTree(at: treeRef)!
+        for path in root {
+            let tree = rootForest.valueTree(at: path.valueTreeReference)!
             update(tree)
         }
     }
@@ -54,8 +54,8 @@ public struct Forest: Sequence {
     public mutating func deleteValueTrees(descendentFrom reference: ValueTreeReference) {
         let timestamp = Date.timeIntervalSinceReferenceDate
         let plantedTree = PlantedValueTree(forest: self, root: reference)
-        for ref in plantedTree {
-            var tree = valueTree(at: ref)!
+        for path in plantedTree {
+            var tree = valueTree(at: path.valueTreeReference)!
             tree.metadata.isDeleted = true
 //            tree.metadata.commitTimestamp = timestamp
             update(tree)
@@ -69,86 +69,87 @@ public struct Forest: Sequence {
     }
     
     public mutating func merge(_ plantedValueTree: PlantedValueTree, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
-        let timestamp = Date.timeIntervalSinceReferenceDate
-        
-        // Gather identifiers for trees before the merge from both forests
-        var treeRefsPriorToMerge = Set<ValueTreeReference>()
-        let existingPlantedValueTree = PlantedValueTree(forest: self, root: plantedValueTree.root)
-        for ref in existingPlantedValueTree {
-            treeRefsPriorToMerge.insert(ref)
-        }
-        for ref in plantedValueTree {
-            treeRefsPriorToMerge.insert(ref)
-        }
-        
-        // Merge
-        for ref in plantedValueTree {
-            var resolvedTree: ValueTree!
-            var updateVersion = false
-            var changed = false
-            
-            let treeInOtherForest = plantedValueTree.forest.valueTree(at: ref)!
-            let treeInThisForest = valueTree(at: ref)
-            if treeInThisForest == nil {
-                // Does not exist in this forest. Just copy it over.
-                resolvedTree = treeInOtherForest
-                changed = true
-            }
-            else if treeInThisForest == treeInOtherForest {
-                // Values unchanged from store. Don't commit data again
-                changed = false
-            }
-            else if treeInOtherForest.metadata.version == treeInThisForest!.metadata.version {
-                // Trees differ, but have the same version. So assume the new tree has uncommited changes, overriding the stored value.
-                resolvedTree = treeInOtherForest
-                updateVersion = true
-                changed = true
-            }
-            else {
-                // Conflict with store. Resolve.
-                resolvedTree = conflictResolver.resolved(fromConflictOf: treeInThisForest!, with: treeInOtherForest)
-                updateVersion = true
-                changed = true
-            }
-            
-            if changed {
-                if updateVersion {  resolvedTree.metadata.generateVersion() }
-                resolvedTree.metadata.commitTimestamp = timestamp
-                update(resolvedTree)
-            }
-        }
-        
-        // Determine what refs exist in the resolved tree
-        var treeRefsPostMerge = Set<ValueTreeReference>()
-        let resolvedPlantedValueTree = PlantedValueTree(forest: self, root: plantedValueTree.root)
-        for ref in resolvedPlantedValueTree {
-            treeRefsPostMerge.insert(ref)
-        }
-        
-        // Delete orphans
-        let orphanRefs = treeRefsPriorToMerge.subtracting(treeRefsPostMerge)
-        for orphanRef in orphanRefs {
-            var orphan = valueTree(at: orphanRef)!
-            orphan.metadata.isDeleted = true
-            orphan.metadata.commitTimestamp = timestamp
-            orphan.metadata.generateVersion()
-            update(orphan)
-        }
+//        let timestamp = Date.timeIntervalSinceReferenceDate
+//        
+//        // Gather identifiers for trees before the merge from both forests
+//        var treeRefsPriorToMerge = Set<ValueTreeReference>()
+//        let existingPlantedValueTree = PlantedValueTree(forest: self, root: plantedValueTree.root)
+//        for path in existingPlantedValueTree {
+//            treeRefsPriorToMerge.insert(path.valueTreeReference)
+//        }
+//        for path in plantedValueTree {
+//            treeRefsPriorToMerge.insert(path.valueTreeReference)
+//        }
+//        
+//        // Merge
+//        for path in plantedValueTree {
+//            let ref = path.valueTreeReference
+//            var resolvedTree: ValueTree!
+//            var updateVersion = false
+//            var changed = false
+//            
+//            let treeInOtherForest = plantedValueTree.forest.valueTree(at: ref)!
+//            let treeInThisForest = valueTree(at: ref)
+//            if treeInThisForest == nil {
+//                // Does not exist in this forest. Just copy it over.
+//                resolvedTree = treeInOtherForest
+//                changed = true
+//            }
+//            else if treeInThisForest == treeInOtherForest {
+//                // Values unchanged from store. Don't commit data again
+//                changed = false
+//            }
+//            else if treeInOtherForest.metadata.version == treeInThisForest!.metadata.version {
+//                // Trees differ, but have the same version. So assume the new tree has uncommited changes, overriding the stored value.
+//                resolvedTree = treeInOtherForest
+//                updateVersion = true
+//                changed = true
+//            }
+//            else {
+//                // Conflict with store. Resolve.
+//                resolvedTree = conflictResolver.resolved(fromConflictOf: treeInThisForest!, with: treeInOtherForest)
+//                updateVersion = true
+//                changed = true
+//            }
+//            
+//            if changed {
+//                if updateVersion {  resolvedTree.metadata.generateVersion() }
+//                resolvedTree.metadata.commitTimestamp = timestamp
+//                update(resolvedTree)
+//            }
+//        }
+//        
+//        // Determine what refs exist in the resolved tree
+//        var treeRefsPostMerge = Set<ValueTreeReference>()
+//        let resolvedPlantedValueTree = PlantedValueTree(forest: self, root: plantedValueTree.root)
+//        for ref in resolvedPlantedValueTree {
+//            treeRefsPostMerge.insert(ref)
+//        }
+//        
+//        // Delete orphans
+//        let orphanRefs = treeRefsPriorToMerge.subtracting(treeRefsPostMerge)
+//        for orphanRef in orphanRefs {
+//            var orphan = valueTree(at: orphanRef)!
+//            orphan.metadata.isDeleted = true
+//            orphan.metadata.commitTimestamp = timestamp
+//            orphan.metadata.generateVersion()
+//            update(orphan)
+//        }
     }
     
     public func valueTree(at reference: ValueTreeReference) -> ValueTree? {
         return valueTreesByReference[reference]
     }
     
-    public func valueTrees(changedSince timestamp: TimeInterval) -> [ValueTree] {
-        var valueTrees = [ValueTree]()
-        for (_, valueTree) in self.valueTreesByReference {
-            let time = valueTree.metadata.commitTimestamp
-            if timestamp <= time {
-                valueTrees.append(valueTree)
-            }
-        }
-        return valueTrees
-    }
+//    public func valueTrees(changedSince timestamp: TimeInterval) -> [ValueTree] {
+//        var valueTrees = [ValueTree]()
+//        for (_, valueTree) in self.valueTreesByReference {
+//            let time = valueTree.metadata.commitTimestamp
+//            if timestamp <= time {
+//                valueTrees.append(valueTree)
+//            }
+//        }
+//        return valueTrees
+//    }
     
 }

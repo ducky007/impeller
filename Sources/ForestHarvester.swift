@@ -22,9 +22,8 @@ public final class ForestHarvester {
         return harvester.harvest()
     }
     
-    func harvestChild<T:Repositable>(identifiedBy uniqueIdentifier: UniqueIdentifier) -> T {
-        let ref = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
-        let valueTree = forest.valueTree(at: ref)
+    func harvestChild<T:Repositable>(_ childReference: ValueTreeReference) -> T {
+        let valueTree = forest.valueTree(at: childReference)
         return harvest(valueTree!)
     }
 }

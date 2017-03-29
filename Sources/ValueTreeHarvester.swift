@@ -63,7 +63,7 @@ final class ValueTreeHarvester: PropertyReader {
     public func read<T:Repositable>(_ key:String) -> T? {
         if  let property = valueTree.get(key),
             let reference = property.asValueTreeReference() {
-            let result:T = forestHarvester.harvestChild(identifiedBy: reference.uniqueIdentifier)
+            let result:T = forestHarvester.harvestChild(reference)
             return result
         }
         else {
@@ -75,7 +75,7 @@ final class ValueTreeHarvester: PropertyReader {
         if  let property = valueTree.get(key),
             let optionalReference = property.asOptionalValueTreeReference(),
             let reference = optionalReference {
-            let result:T = forestHarvester.harvestChild(identifiedBy: reference.uniqueIdentifier)
+            let result:T = forestHarvester.harvestChild(reference)
             return result
         }
         else {
@@ -86,7 +86,7 @@ final class ValueTreeHarvester: PropertyReader {
     public func read<T:Repositable>(_ key:String) -> [T]? {
         if  let property = valueTree.get(key),
             let references = property.asValueTreeReferences() {
-            let result: [T] = references.map { self.forestHarvester.harvestChild(identifiedBy: $0.uniqueIdentifier) }
+            let result: [T] = references.map { self.forestHarvester.harvestChild($0) }
             return result
         }
         else {
