@@ -51,12 +51,38 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Get tree from our forest, as it was fetched.
         // If the tree is new, set commit ids on all descendants, 
         // and commit it directly to our forest
-        guard let fetchedTree = forest.valueTree(at: planter.rootReference) else {
+        guard forest.valueTree(at: planter.rootReference) != nil else {
             commit(newlyInsertedTree: plantedTree, for: newCommit.identifier)
+            let harvester = ForestHarvester(forest: forest)
+            let rootTree = forest.valueTree(at: plantedTree.root)!
+            value = harvester.harvest(rootTree)
             return
         }
         
         // Determine which value trees have changed, and which should be deleted
+        // Go through and compare new value trees with old values, to determine what changed.
+        var updatedRefs: Set<ValueTreeReference> = []
+        var unchangedRefs: Set<ValueTreeReference> = []
+        var newRefs: Set<ValueTreeReference> = []
+        for path in plantedTree {
+            let ref = path.valueTreeReference
+            let commitValueTree = commitForest.valueTree(at: ref)
+            if let fetchValueTree = forest.valueTree(at: ref) {
+                if fetchValueTree != commitValueTree {
+                    updatedRefs.insert(ref)
+                }
+                else {
+                    unchangedRefs.insert(ref)
+                }
+            }
+            else {
+                newRefs.insert(ref)
+            }
+        }
+        
+        // Mark any ancestor of a changed value tree as also being changed.
+        
+        // Determine which trees have been orphaned
         
         // If there are changes, create commit root value tree
         
@@ -99,6 +125,8 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Insert new value trees
         let newPlantedTree = PlantedValueTree(forest: finalizedForest, root: rootRef)
         forest.insertValueTrees(descendentFrom: newPlantedTree)
+        
+        return newPlantedTree.root
     }
     
     public func delete<T:Repositable>(_ root: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
