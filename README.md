@@ -44,6 +44,12 @@ Our objective with Impeller is that it should fall firmly in the _lightweight_ c
 
 Impeller is currently only available for iOS. It is a Swift module, requiring Swift 3.
 
+
+### Swift Package Manager
+
+Impeller does support the Swift Package Manager, but is not currently listed in any package catalogs, because it is still too immature and experimental.
+
+
 ### Carthage
 
 Add Impeller to your _Cartfile_ to have it installed by Carthage.
@@ -51,6 +57,7 @@ Add Impeller to your _Cartfile_ to have it installed by Carthage.
     github "mentalfaculty/impeller" ~> 0.1
 
 Build using `carthage update`, and drag `Impeller.framework` into Xcode.
+
 
 ### Manual
 
