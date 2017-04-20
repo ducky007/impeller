@@ -44,7 +44,7 @@ public struct ValueTreeReference: Equatable, Hashable {
     
     public var asString: String {
         let id = identity
-        return "\(id.repositedType)__\(id.uniqueIdentifier)__\(commitIdentifier)"
+        return "\(id.repositedType)__\(id.uniqueIdentifier)__\(commitIdentifier ?? "Uncommitted")"
     }
 }
 

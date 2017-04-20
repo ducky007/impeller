@@ -33,11 +33,14 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     /// Resolves conflicts and commits, and sets the value on out to resolved value.
     public func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
         queue.sync {
-            performCommit(&value, resolvingConflictsWith: conflictResolver)
+            performCommit(&value)
+            
+            // TODO: Check here if the committed value is still the head. If not, merge with head.
+            // Perhaps we can add a merge method to planted tree. It could work recursively.
         }
     }
     
-    private func performCommit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver) {
+    private func performCommit<T:Repositable>(_ value: inout T) {
         // Plant new values in a temporary commit forest
         let planter = ForestPlanter(withRoot: value)
         let commitForest = planter.forest
@@ -59,28 +62,34 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             return
         }
         
-        // Determine which value trees have changed, and which should be deleted
+        // Determine which value trees have changed
         // Go through and compare new value trees with old values, to determine what changed.
+        // Ancestors of changed trees are also considered changed, as the value tree references they contain are no 
+        // longer valid. Ie they must reference the newly changed trees.
         var updatedRefs: Set<ValueTreeReference> = []
-        var unchangedRefs: Set<ValueTreeReference> = []
+//        var unchangedRefs: Set<ValueTreeReference> = []
         var newRefs: Set<ValueTreeReference> = []
         for path in plantedTree {
             let ref = path.valueTreeReference
             let commitValueTree = commitForest.valueTree(at: ref)
             if let fetchValueTree = forest.valueTree(at: ref) {
                 if fetchValueTree != commitValueTree {
-                    updatedRefs.insert(ref)
+                    updatedRefs.formUnion(path.pathFromRoot) // Tree and ancestors
                 }
-                else {
-                    unchangedRefs.insert(ref)
-                }
+//                else {
+//                    unchangedRefs.insert(ref)
+//                }
             }
             else {
                 newRefs.insert(ref)
             }
         }
         
-        // Mark any ancestor of a changed value tree as also being changed.
+        // Unchanged refs may contain trees with changed descendants, so remove those.
+//        unchangedRefs.subtract(updatedRefs)
+        
+        // Should be no overlap between new trees, and changed trees
+        assert(updatedRefs.isDisjoint(with: newRefs))
         
         // Determine which trees have been orphaned
         
@@ -89,7 +98,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Determine the absolute root of the planted tree
     
         // Merge into forest
-        forest.merge(plantedTree, resolvingConflictsWith: conflictResolver)
+//        forest.merge(plantedTree, resolvingConflictsWith: conflictResolver)
         
         // Harvest
 //        let newValueTree = forest.valueTree(at: rootRef)!
