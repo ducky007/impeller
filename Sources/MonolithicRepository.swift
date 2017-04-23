@@ -68,7 +68,8 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // longer valid. Ie they must reference the newly changed trees.
         var updatedRefs: Set<ValueTreeReference> = []
 //        var unchangedRefs: Set<ValueTreeReference> = []
-        var newRefs: Set<ValueTreeReference> = []
+        let rootAncestry = fetchRoot.metadata.ancestry!
+        var ancestryByNewRef: [ValueTreeReference:[ValueTreeIdentity]] = [:]
         for path in commitPlantedTree {
             let ref = path.valueTreeReference
             let commitValueTree = commitForest.valueTree(at: ref)
@@ -81,51 +82,83 @@ public class MonolithicRepository: LocalRepository, Exchangable {
 //                }
             }
             else {
-                newRefs.insert(ref)
+                ancestryByNewRef[ref] = rootAncestry + path.ancestorReferences.map { $0.identity }
             }
         }
         
-        // If there are no changes, don't commit anything
-        guard newRefs.count + updatedRefs.count > 0 else { return }
+        // If there are no changes, don't commit anything. Otherwise, prepare a commit.
+        guard ancestryByNewRef.count + updatedRefs.count > 0 else { return }
+        let newCommit = history.commitHead(basedOn: headWhenFetched)
         
         // Unchanged refs may contain trees with changed descendants, so remove those.
 //        unchangedRefs.subtract(updatedRefs)
         
         // Should be no overlap between new trees, and changed trees
-        assert(updatedRefs.isDisjoint(with: newRefs))
+        assert(updatedRefs.isDisjoint(with: Set(ancestryByNewRef.keys)))
         
-        // Determine which trees have been orphaned
+        // Determine which trees have been orphaned. Update them, and insert new copy in forest.
         let fetchPlantedTree = PlantedValueTree(forest: forest, root: fetchRoot.valueTreeReference)
-        var orphanForest = Forest()
         for path in fetchPlantedTree {
             let ref = path.valueTreeReference
             if commitForest.valueTree(at: ref) == nil {
-                let orphanPlantedTree = PlantedValueTree(forest: forest, root: ref)
-                orphanForest.insertValueTrees(descendentFrom: orphanPlantedTree)
+                var orphan = forest.valueTree(at: ref)!
+                
+                // Update child references. If an value tree is orphaned, so are all its
+                // descendants, so all child references have the new commit identifier.
+                orphan.updateChildReferences {
+                    ValueTreeReference(identity: $0.identity, commitIdentifier: newCommit.identifier)
+                }
+                
+                // Update metadata
+                var newMetadata = orphan.metadata
+                newMetadata.commitIdentifier = newCommit.identifier
+                newMetadata.isDeleted = true
+                orphan.metadata = newMetadata
+            
+                forest.update(orphan)
             }
         }
         
-        // Update the orphans, and reinsert
-        let newCommit = history.commitHead(basedOn: headWhenFetched)
-        for path in orphanForest {
-            var tree = orphanForest.valueTree(at: path.valueTreeReference)!
-
-            // Update child references
-            tree.updateChildReferences {
+        // Add all new trees.
+        for (ref, ancestry) in ancestryByNewRef {
+            var newValueTree = commitForest.valueTree(at: ref)!
+            
+            // Update child references. All children must also be new, and get the new commit identifier.
+            newValueTree.updateChildReferences {
                 ValueTreeReference(identity: $0.identity, commitIdentifier: newCommit.identifier)
             }
             
             // Update metadata
-            var newMetadata = tree.metadata
+            var newMetadata = newValueTree.metadata
             newMetadata.commitIdentifier = newCommit.identifier
-            newMetadata.isDeleted = true
-            tree.metadata = newMetadata
+            newMetadata.ancestry = ancestry
+            newValueTree.metadata = newMetadata
             
-            // Add to forest
-            forest.update(tree)
+            forest.update(newValueTree)
         }
         
-        // Insert the deleted orphans in the main forest
+        // Insert new versions of updated trees.
+        let identitiesOfUpdated = Set(updatedRefs.map({ $0.identity }))
+        let identitiesOfNew = Set(ancestryByNewRef.keys.map({ $0.identity }))
+        let identitiesOfCommitted = identitiesOfUpdated.union(identitiesOfNew)
+        for ref in updatedRefs {
+            // Most trees will be in the commit forest, but it is possible that ancestors 
+            // are not. In that case, fetch them from the main forest.
+            var newValueTree = commitForest.valueTree(at: ref) ?? forest.valueTree(at: ref)!
+
+            // Update child references.
+            newValueTree.updateChildReferences {
+                let newCommitId = identitiesOfCommitted.contains($0.identity) ? newCommit.identifier : $0.commitIdentifier
+                return ValueTreeReference(identity: $0.identity, commitIdentifier: newCommitId)
+            }
+            
+            // Update metadata
+            var newMetadata = newValueTree.metadata
+            newMetadata.commitIdentifier = newCommit.identifier
+            newValueTree.metadata = newMetadata
+            
+            forest.update(newValueTree)
+        }
         
         // Create commit root value tree
 
