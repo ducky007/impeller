@@ -67,7 +67,6 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Ancestors of changed trees are also considered changed, as the value tree references they contain are no 
         // longer valid. Ie they must reference the newly changed trees.
         var updatedRefs: Set<ValueTreeReference> = []
-//        var unchangedRefs: Set<ValueTreeReference> = []
         let rootAncestry = fetchRoot.metadata.ancestry!
         var ancestryByNewRef: [ValueTreeReference:[ValueTreeIdentity]] = [:]
         for path in commitPlantedTree {
@@ -75,23 +74,24 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             let commitValueTree = commitForest.valueTree(at: ref)
             if let fetchValueTree = forest.valueTree(at: ref) {
                 if fetchValueTree != commitValueTree {
+                    
+                    // TODO: We need to include the ancestors of the root. pathFromRoot only gives up to the commit root, not absolute root
+                    // Need to use the root value tree metadata ancestry, with fetch, to get the value trees at time of fetch
+                    // Use the new valueTreeReference(...) method below
+                    
                     updatedRefs.formUnion(path.pathFromRoot) // Tree and ancestors
                 }
-//                else {
-//                    unchangedRefs.insert(ref)
-//                }
             }
             else {
                 ancestryByNewRef[ref] = rootAncestry + path.ancestorReferences.map { $0.identity }
             }
         }
         
-        // If there are no changes, don't commit anything. Otherwise, prepare a commit.
+        // If there are no changes, don't commit anything.
         guard ancestryByNewRef.count + updatedRefs.count > 0 else { return }
-        let newCommit = history.commitHead(basedOn: headWhenFetched)
         
-        // Unchanged refs may contain trees with changed descendants, so remove those.
-//        unchangedRefs.subtract(updatedRefs)
+        // Prepare a commit
+        let newCommit = history.commitHead(basedOn: headWhenFetched)
         
         // Should be no overlap between new trees, and changed trees
         assert(updatedRefs.isDisjoint(with: Set(ancestryByNewRef.keys)))
@@ -103,7 +103,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             if commitForest.valueTree(at: ref) == nil {
                 var orphan = forest.valueTree(at: ref)!
                 
-                // Update child references. If an value tree is orphaned, so are all its
+                // Update child references. If a value tree is orphaned, so are all its
                 // descendants, so all child references have the new commit identifier.
                 orphan.updateChildReferences {
                     ValueTreeReference(identity: $0.identity, commitIdentifier: newCommit.identifier)
@@ -123,7 +123,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         for (ref, ancestry) in ancestryByNewRef {
             var newValueTree = commitForest.valueTree(at: ref)!
             
-            // Update child references. All children must also be new, and get the new commit identifier.
+            // Update child references. All children must also be new, so they have the new commit identifier.
             newValueTree.updateChildReferences {
                 ValueTreeReference(identity: $0.identity, commitIdentifier: newCommit.identifier)
             }
@@ -140,7 +140,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Insert new versions of updated trees.
         let identitiesOfUpdated = Set(updatedRefs.map({ $0.identity }))
         let identitiesOfNew = Set(ancestryByNewRef.keys.map({ $0.identity }))
-        let identitiesOfCommitted = identitiesOfUpdated.union(identitiesOfNew)
+        let identitiesOfNewlyCommitted = identitiesOfUpdated.union(identitiesOfNew)
         for ref in updatedRefs {
             // Most trees will be in the commit forest, but it is possible that ancestors 
             // are not. In that case, fetch them from the main forest.
@@ -148,7 +148,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
 
             // Update child references.
             newValueTree.updateChildReferences {
-                let newCommitId = identitiesOfCommitted.contains($0.identity) ? newCommit.identifier : $0.commitIdentifier
+                let newCommitId = identitiesOfNewlyCommitted.contains($0.identity) ? newCommit.identifier : $0.commitIdentifier
                 return ValueTreeReference(identity: $0.identity, commitIdentifier: newCommitId)
             }
             
@@ -159,13 +159,6 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             
             forest.update(newValueTree)
         }
-        
-        // Create commit root value tree
-
-        // Determine the absolute root of the planted tree
-    
-        // Merge into forest
-//        forest.merge(plantedTree, resolvingConflictsWith: conflictResolver)
         
         // Harvest
 //        let newValueTree = forest.valueTree(at: rootRef)!
@@ -200,7 +193,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         
         // Insert new value trees
         let newPlantedTree = PlantedValueTree(forest: finalizedForest, root: rootRef)
-        forest.insertValueTrees(descendentFrom: newPlantedTree)
+        forest.insertValueTrees(descendantFrom: newPlantedTree)
         
         // TODO: Need to add this new tree to the commit root node
     }
@@ -217,7 +210,12 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     
     private func performDelete<T:Repositable>(_ root: inout T) {
         let rootTree = ValueTreePlanter(repositable: root).valueTree
-        forest.deleteValueTrees(descendentFrom: rootTree.valueTreeReference)
+        forest.deleteValueTrees(descendantFrom: rootTree.valueTreeReference)
+    }
+    
+    private func valueTreeReference(for identity: ValueTreeIdentity, commitIdentifier: CommitIdentifier) -> ValueTreeReference {
+        // TODO: Move back in history from commit until a value tree is found with the right identity.
+        // Walk back in commit history until one is found.
     }
     
     public func fetchValue<T:Repositable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T? {

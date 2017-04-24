@@ -43,7 +43,7 @@ public struct Forest: Sequence {
         }
     }
     
-    public mutating func insertValueTrees(descendentFrom root: PlantedValueTree) {
+    public mutating func insertValueTrees(descendantFrom root: PlantedValueTree) {
         let rootForest = root.forest
         for path in root {
             let tree = rootForest.valueTree(at: path.valueTreeReference)!
@@ -51,7 +51,7 @@ public struct Forest: Sequence {
         }
     }
     
-    public mutating func deleteValueTrees(descendentFrom reference: ValueTreeReference) {
+    public mutating func deleteValueTrees(descendantFrom reference: ValueTreeReference) {
         let timestamp = Date.timeIntervalSinceReferenceDate
         let plantedTree = PlantedValueTree(forest: self, root: reference)
         for path in plantedTree {
@@ -60,6 +60,8 @@ public struct Forest: Sequence {
 //            tree.metadata.commitTimestamp = timestamp
             update(tree)
         }
+        
+        // TODO: Need to remove the deleted tree from any ancestors. Have to fetch ancestors and update appropriately.
     }
     
     // Inserts a value tree, or updates an existing one

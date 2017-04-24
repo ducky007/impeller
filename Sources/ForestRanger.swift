@@ -33,12 +33,12 @@ public struct ForestRanger: IteratorProtocol {
         guard let treeRef = path.pathFromRoot.last, let valueTree = plantedValueTree.forest.valueTree(at: treeRef) else { return [] }
         
         let childRefs = valueTree.childReferences
-        var childDescendentPaths: [ValueTreePath] = []
+        var childDescendantPaths: [ValueTreePath] = []
         for childRef in childRefs {
             let childPath = path.appending(childRef)
-            childDescendentPaths.append(contentsOf: visitationList(forTreeAt: childPath))
+            childDescendantPaths.append(contentsOf: visitationList(forTreeAt: childPath))
         }
         
-        return [path] + childDescendentPaths
+        return [path] + childDescendantPaths
     }
 }
