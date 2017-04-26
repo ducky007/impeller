@@ -213,9 +213,18 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         forest.deleteValueTrees(descendantFrom: rootTree.valueTreeReference)
     }
     
-    private func valueTreeReference(for identity: ValueTreeIdentity, commitIdentifier: CommitIdentifier) -> ValueTreeReference {
-        // TODO: Move back in history from commit until a value tree is found with the right identity.
-        // Walk back in commit history until one is found.
+    private func valueTreeReference(for identity: ValueTreeIdentity, applicableAtCommit commitIdentifier: CommitIdentifier) -> ValueTreeReference? {
+        // Move back in history from commit until a value tree is found with the right identity.
+        var result: ValueTreeReference?
+        history.visit(predecessorsOfCommitIdentifiedBy: commitIdentifier) { commit in
+            let ref = ValueTreeReference(identity: identity, commitIdentifier: commit.identifier)
+            if forest.valueTree(at: ref) != nil {
+                result = ref
+                return false
+            }
+            return true
+        }
+        return result
     }
     
     public func fetchValue<T:Repositable>(identifiedBy uniqueIdentifier:UniqueIdentifier) -> T? {
