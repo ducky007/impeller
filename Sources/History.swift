@@ -117,17 +117,17 @@ struct History {
     }
     
     /// Block returns true to continue the visits, and false to terminate
-    func visit(predecessorsOfCommitIdentifiedBy commitIdentifier: CommitIdentifier, executing block: (Commit)->Bool ) {
-        let _ = performVisit(predecessorsOfCommitIdentifiedBy: commitIdentifier, executing: block)
+    func visitPredecessors(ofCommitIdentifiedBy commitIdentifier: CommitIdentifier, executing block: (Commit)->Bool ) {
+        let _ = performVisitPredecessors(ofCommitIdentifiedBy: commitIdentifier, executing: block)
     }
     
-    private func performVisit(predecessorsOfCommitIdentifiedBy commitIdentifier: CommitIdentifier, executing block: (Commit)->Bool ) -> Bool {
+    private func performVisitPredecessors(ofCommitIdentifiedBy commitIdentifier: CommitIdentifier, executing block: (Commit)->Bool ) -> Bool {
         guard let commit = commitsByIdentifier[commitIdentifier] else { return true }
         guard block(commit) else { return false }
         guard let lineage = commit.lineage else { return true }
-        guard performVisit(predecessorsOfCommitIdentifiedBy: lineage.predecessorIdentifier, executing:  block) else { return false }
+        guard performVisitPredecessors(ofCommitIdentifiedBy: lineage.predecessorIdentifier, executing:  block) else { return false }
         guard let predecessor = lineage.mergedPredecessorIdentifier else { return true }
-        guard performVisit(predecessorsOfCommitIdentifiedBy: predecessor, executing:  block) else { return false }
+        guard performVisitPredecessors(ofCommitIdentifiedBy: predecessor, executing:  block) else { return false }
         return true
     }
 }

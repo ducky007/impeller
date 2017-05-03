@@ -216,7 +216,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
     private func valueTreeReference(for identity: ValueTreeIdentity, applicableAtCommit commitIdentifier: CommitIdentifier) -> ValueTreeReference? {
         // Move back in history from commit until a value tree is found with the right identity.
         var result: ValueTreeReference?
-        history.visit(predecessorsOfCommitIdentifiedBy: commitIdentifier) { commit in
+        history.visitPredecessors(ofCommitIdentifiedBy: commitIdentifier) { commit in
             let ref = ValueTreeReference(identity: identity, commitIdentifier: commit.identifier)
             if forest.valueTree(at: ref) != nil {
                 result = ref
@@ -231,12 +231,14 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         var result: T?
         queue.sync {
             let identity = ValueTreeIdentity(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
-//            let ref = ValueTreeReference(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
-//            if let valueTree = forest.valueTree(at: ref), !valueTree.metadata.isDeleted {
-//                let harvester = ForestHarvester(forest: forest)
-//                let repositable:T = harvester.harvest(valueTree)
-//                result = repositable
-//            }
+            guard
+                let head = history.head,
+                let ref = valueTreeReference(for: identity, applicableAtCommit: head),
+                let valueTree = forest.valueTree(at: ref),
+                !valueTree.metadata.isDeleted else { return }
+            let harvester = ForestHarvester(forest: forest)
+            let repositable:T = harvester.harvest(valueTree)
+            result = repositable
         }
         return result
     }
