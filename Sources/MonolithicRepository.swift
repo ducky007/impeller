@@ -54,7 +54,7 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // If the tree is new, set commit ids on all descendants, 
         // and commit it directly to our forest
         guard let fetchRoot = forest.valueTree(at: planter.rootReference) else {
-            let newCommit = history.commitHead(basedOn: headWhenFetched)
+            let newCommit = history.commitHead(basedOn: nil)
             commit(newlyInsertedTree: commitPlantedTree, for: newCommit.identifier)
             let harvester = ForestHarvester(forest: forest)
             let rootTree = forest.valueTree(at: commitPlantedTree.root)!
@@ -236,6 +236,15 @@ public class MonolithicRepository: LocalRepository, Exchangable {
                 let ref = valueTreeReference(for: identity, applicableAtCommit: head),
                 let valueTree = forest.valueTree(at: ref),
                 !valueTree.metadata.isDeleted else { return }
+            
+            // Set the headWhenFetched for the whole tree
+            let plantedTree = PlantedValueTree(forest: forest, root: ref)
+            var tempForest = Forest()
+            for ref in plantedTree {
+                
+            }
+            
+            // Harvest
             let harvester = ForestHarvester(forest: forest)
             let repositable:T = harvester.harvest(valueTree)
             result = repositable
