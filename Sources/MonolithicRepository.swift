@@ -233,20 +233,23 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             let identity = ValueTreeIdentity(uniqueIdentifier: uniqueIdentifier, repositedType: T.repositedType)
             guard
                 let head = history.head,
-                let ref = valueTreeReference(for: identity, applicableAtCommit: head),
-                let valueTree = forest.valueTree(at: ref),
+                let rootRef = valueTreeReference(for: identity, applicableAtCommit: head),
+                let valueTree = forest.valueTree(at: rootRef),
                 !valueTree.metadata.isDeleted else { return }
             
-            // Set the headWhenFetched for the whole tree
-            let plantedTree = PlantedValueTree(forest: forest, root: ref)
+            // Set the headWhenFetched for the whole tree. Use a temporary forest to store new values.
+            let plantedTree = PlantedValueTree(forest: forest, root: rootRef)
             var tempForest = Forest()
-            for ref in plantedTree {
-                
+            for path in plantedTree {
+                var fetchedTree = forest.valueTree(at: path.valueTreeReference)!
+                fetchedTree.metadata.headWhenFetched = head
+                tempForest.update(fetchedTree)
             }
             
             // Harvest
-            let harvester = ForestHarvester(forest: forest)
-            let repositable:T = harvester.harvest(valueTree)
+            let rootTree = tempForest.valueTree(at: rootRef)!
+            let harvester = ForestHarvester(forest: tempForest)
+            let repositable:T = harvester.harvest(rootTree)
             result = repositable
         }
         return result
