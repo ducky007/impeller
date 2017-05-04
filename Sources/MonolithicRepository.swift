@@ -48,12 +48,13 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         
         // Fetched commit
         let commitRoot = commitForest.valueTree(at: planter.rootReference)!
-        let headWhenFetched = commitRoot.metadata.headWhenFetched
         
         // Get tree from our forest, as it was fetched.
         // If the tree is new, set commit ids on all descendants, 
         // and commit it directly to our forest
-        guard let fetchRoot = forest.valueTree(at: planter.rootReference) else {
+        guard
+            let headWhenFetched = commitRoot.metadata.headWhenFetched,
+            let fetchRoot = forest.valueTree(at: planter.rootReference) else {
             let newCommit = history.commitHead(basedOn: nil)
             commit(newlyInsertedTree: commitPlantedTree, for: newCommit.identifier)
             let harvester = ForestHarvester(forest: forest)
@@ -67,23 +68,20 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Ancestors of changed trees are also considered changed, as the value tree references they contain are no 
         // longer valid. Ie they must reference the newly changed trees.
         var updatedRefs: Set<ValueTreeReference> = []
-        let rootAncestry = fetchRoot.metadata.ancestry!
+        let rootAncestryIdentities = fetchRoot.metadata.ancestry!
+        let rootAncestryRefs = rootAncestryIdentities.map { valueTreeReference(for: $0, applicableAtCommit: headWhenFetched)! }
         var ancestryByNewRef: [ValueTreeReference:[ValueTreeIdentity]] = [:]
         for path in commitPlantedTree {
             let ref = path.valueTreeReference
             let commitValueTree = commitForest.valueTree(at: ref)
             if let fetchValueTree = forest.valueTree(at: ref) {
                 if fetchValueTree != commitValueTree {
-                    
-                    // TODO: We need to include the ancestors of the root. pathFromRoot only gives up to the commit root, not absolute root
-                    // Need to use the root value tree metadata ancestry, with fetch, to get the value trees at time of fetch
-                    // Use the new valueTreeReference(...) method below
-                    
-                    updatedRefs.formUnion(path.pathFromRoot) // Tree and ancestors
+                    updatedRefs.formUnion(path.pathFromRoot) // Tree and ancestors up to commit root
+                    updatedRefs.formUnion(rootAncestryRefs)  // Ancestors of root
                 }
             }
             else {
-                ancestryByNewRef[ref] = rootAncestry + path.ancestorReferences.map { $0.identity }
+                ancestryByNewRef[ref] = rootAncestryIdentities + path.ancestorReferences.map { $0.identity }
             }
         }
         
@@ -161,9 +159,10 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         }
         
         // Harvest
-//        let newValueTree = forest.valueTree(at: rootRef)!
-//        let harvester = ForestHarvester(forest: forest)
-//        value = harvester.harvest(newValueTree)
+        let newRootRef = ValueTreeReference(identity: commitRoot.valueTreeReference.identity, commitIdentifier: newCommit.identifier)
+        let newValueTree = forest.valueTree(at: newRootRef)!
+        let harvester = ForestHarvester(forest: forest)
+        value = harvester.harvest(newValueTree)
     }
     
     private func commit(newlyInsertedTree plantedTree: PlantedValueTree, for commitIdentifier: CommitIdentifier) {
