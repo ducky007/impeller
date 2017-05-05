@@ -28,8 +28,8 @@ struct Child: Repositable {
         return left.age == right.age
     }
     
-    // Take child with newest timestamp
-    func resolvedValue(forConflictWith newValue:Repositable, context: Any? = nil) -> Child {
-        return newValue.metadata.commitTimestamp > metadata.commitTimestamp ? newValue as! Child : self
-    }
+//    // Take child with newest timestamp
+//    func resolvedValue(forConflictWith newValue:Repositable, context: Any? = nil) -> Child {
+//        return newValue.metadata.commitTimestamp > metadata.commitTimestamp ? newValue as! Child : self
+//    }
 }

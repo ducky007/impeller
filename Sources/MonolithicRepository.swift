@@ -57,9 +57,11 @@ public class MonolithicRepository: LocalRepository, Exchangable {
             let fetchRoot = forest.valueTree(at: planter.rootReference) else {
             let newCommit = history.commitHead(basedOn: nil)
             commit(newlyInsertedTree: commitPlantedTree, for: newCommit.identifier)
-            let harvester = ForestHarvester(forest: forest)
-            let rootTree = forest.valueTree(at: commitPlantedTree.root)!
-            value = harvester.harvest(rootTree)
+                
+            let newRootRef = ValueTreeReference(identity: commitPlantedTree.root.identity, commitIdentifier: newCommit.identifier)
+            let plantedTree = PlantedValueTree(forest: forest, root: newRootRef)
+            value = harvest(plantedTree, forHead: newCommit.identifier)
+            
             return
         }
         
@@ -73,9 +75,9 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         var ancestryByNewRef: [ValueTreeReference:[ValueTreeIdentity]] = [:]
         for path in commitPlantedTree {
             let ref = path.valueTreeReference
-            let commitValueTree = commitForest.valueTree(at: ref)
+            let commitValueTree = commitForest.valueTree(at: ref)!
             if let fetchValueTree = forest.valueTree(at: ref) {
-                if fetchValueTree != commitValueTree {
+                if fetchValueTree.propertiesByName != commitValueTree.propertiesByName {
                     updatedRefs.formUnion(path.pathFromRoot) // Tree and ancestors up to commit root
                     updatedRefs.formUnion(rootAncestryRefs)  // Ancestors of root
                 }
@@ -159,10 +161,9 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         }
         
         // Harvest
-        let newRootRef = ValueTreeReference(identity: commitRoot.valueTreeReference.identity, commitIdentifier: newCommit.identifier)
-        let newValueTree = forest.valueTree(at: newRootRef)!
-        let harvester = ForestHarvester(forest: forest)
-        value = harvester.harvest(newValueTree)
+        let newRootRef = ValueTreeReference(identity: commitPlantedTree.root.identity, commitIdentifier: newCommit.identifier)
+        let plantedTree = PlantedValueTree(forest: forest, root: newRootRef)
+        value = harvest(plantedTree, forHead: newCommit.identifier)
     }
     
     private func commit(newlyInsertedTree plantedTree: PlantedValueTree, for commitIdentifier: CommitIdentifier) {
@@ -193,8 +194,6 @@ public class MonolithicRepository: LocalRepository, Exchangable {
         // Insert new value trees
         let newPlantedTree = PlantedValueTree(forest: finalizedForest, root: rootRef)
         forest.insertValueTrees(descendantFrom: newPlantedTree)
-        
-        // TODO: Need to add this new tree to the commit root node
     }
     
     public func delete<T:Repositable>(_ root: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {
@@ -235,23 +234,27 @@ public class MonolithicRepository: LocalRepository, Exchangable {
                 let rootRef = valueTreeReference(for: identity, applicableAtCommit: head),
                 let valueTree = forest.valueTree(at: rootRef),
                 !valueTree.metadata.isDeleted else { return }
-            
-            // Set the headWhenFetched for the whole tree. Use a temporary forest to store new values.
             let plantedTree = PlantedValueTree(forest: forest, root: rootRef)
-            var tempForest = Forest()
-            for path in plantedTree {
-                var fetchedTree = forest.valueTree(at: path.valueTreeReference)!
-                fetchedTree.metadata.headWhenFetched = head
-                tempForest.update(fetchedTree)
-            }
-            
-            // Harvest
-            let rootTree = tempForest.valueTree(at: rootRef)!
-            let harvester = ForestHarvester(forest: tempForest)
-            let repositable:T = harvester.harvest(rootTree)
-            result = repositable
+            result = harvest(plantedTree, forHead: head)
         }
         return result
+    }
+    
+    private func harvest<T:Repositable>(_ plantedTree: PlantedValueTree, forHead head: CommitIdentifier) -> T {
+        // Set the headWhenFetched for the whole tree. Use a temporary forest to store new values.
+        let harvestPlantedTree = plantedTree.map {
+            var new = $0
+            new.metadata.headWhenFetched = head
+            return new
+        }
+        
+        // Harvest
+        let harvestForest = harvestPlantedTree.forest
+        let rootTree = harvestForest.valueTree(at: harvestPlantedTree.root)!
+        let harvester = ForestHarvester(forest: harvestForest)
+        let repositable:T = harvester.harvest(rootTree)
+        
+        return repositable
     }
     
     public func push(changesSince cursor: Cursor?, completionHandler completion: @escaping (Error?, [ValueTree], Cursor?)->Void) {
