@@ -46,6 +46,7 @@
 		07AB7AE51E4740270025A33B /* ForestRanger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE41E4740270025A33B /* ForestRanger.swift */; };
 		07AB7AE71E4A4F010025A33B /* PlantedValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB7AE61E4A4F010025A33B /* PlantedValueTree.swift */; };
 		07C769991E0469920063CB4A /* ValueTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C769981E0469920063CB4A /* ValueTree.swift */; };
+		07EFFCF01EBCE3E50094B247 /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C5C2281E40F3F6009596F4 /* SerializationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -567,6 +568,7 @@
 				0737AAF31DF9524E00ABBA90 /* BasicTests.swift in Sources */,
 				0707B4321DF9DE0F00FE8F40 /* Child.swift in Sources */,
 				0707B4301DF9DDC300FE8F40 /* Parent.swift in Sources */,
+				07EFFCF01EBCE3E50094B247 /* SerializationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

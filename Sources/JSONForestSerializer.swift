@@ -51,7 +51,7 @@ public class JSONForestSerializer: ForestSerializer {
 extension ValueTree: JSONRepresentable {
     
     public enum JSONKey: String {
-        case metadata, repositedType, uniqueIdentifier, commitIdentifier, isDeleted, propertiesByName, timestampsByPropertyName
+        case metadata, repositedType, uniqueIdentifier, commitIdentifier, isDeleted, propertiesByName, timestampsByPropertyName, ancestry
     }
     
     public init(withJSONRepresentation json: Any) throws {
@@ -65,7 +65,8 @@ extension ValueTree: JSONRepresentable {
             let repositedType = metadataDict[JSONKey.repositedType.rawValue] as? RepositedType,
             let commitIdentifier = metadataDict[JSONKey.commitIdentifier.rawValue] as? CommitIdentifier,
             let timestampsByPropertyName = metadataDict[JSONKey.timestampsByPropertyName.rawValue] as? [String:TimeInterval],
-            let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool else {
+            let isDeleted = metadataDict[JSONKey.isDeleted.rawValue] as? Bool,
+            let ancestry = metadataDict[JSONKey.ancestry.rawValue] as? [[String:String]] else {
             throw JSONSerializationError.invalidMetadata
         }
         
@@ -73,6 +74,11 @@ extension ValueTree: JSONRepresentable {
         metadata.commitIdentifier = commitIdentifier
         metadata.isDeleted = isDeleted
         metadata.timestampsByPropertyName = timestampsByPropertyName
+        metadata.ancestry = ancestry.map {
+            let uniqueId = $0[JSONKey.uniqueIdentifier.rawValue]!
+            let type = $0[JSONKey.repositedType.rawValue]!
+            return ValueTreeIdentity(uniqueIdentifier: uniqueId, repositedType: type)
+        }
         
         self.repositedType = repositedType
         self.metadata = metadata
@@ -92,7 +98,10 @@ extension ValueTree: JSONRepresentable {
             JSONKey.uniqueIdentifier.rawValue : metadata.uniqueIdentifier,
             JSONKey.commitIdentifier.rawValue : metadata.commitIdentifier!,
             JSONKey.isDeleted.rawValue : metadata.isDeleted,
-            JSONKey.timestampsByPropertyName.rawValue : metadata.timestampsByPropertyName
+            JSONKey.timestampsByPropertyName.rawValue : metadata.timestampsByPropertyName,
+            JSONKey.ancestry.rawValue : metadata.ancestry!.map {
+                [JSONKey.repositedType.rawValue: $0.repositedType, JSONKey.uniqueIdentifier.rawValue: $0.uniqueIdentifier]
+            }
         ]
         json[JSONKey.metadata.rawValue] = metadataDict
         json[JSONKey.propertiesByName.rawValue] = propertiesByName.mapValues { _, property in
