@@ -12,16 +12,15 @@ import Impeller
 class SerializationTests: XCTestCase {
     
     var repository: MonolithicRepository!
-    var serializer: JSONForestSerializer!
     let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent("SerializationTests")
     var storeURL: URL!
     
     override func setUp() {
         super.setUp()
+        try? FileManager.default.removeItem(at: dirURL)
         try? FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: false, attributes: nil)
         storeURL = dirURL.appendingPathComponent("store.db")
         repository = MonolithicRepository()
-        serializer = JSONForestSerializer()
     }
     
     override func tearDown() {
@@ -31,7 +30,7 @@ class SerializationTests: XCTestCase {
     
     func testFileIsCreated() throws {
         XCTAssertFalse(FileManager.default.fileExists(atPath: storeURL.path))
-        try repository.save(to: storeURL, with: serializer)
+        try repository.saveJSON(to: storeURL)
         XCTAssertTrue(FileManager.default.fileExists(atPath: storeURL.path))
     }
     
@@ -39,8 +38,8 @@ class SerializationTests: XCTestCase {
         var person = Person()
         person.name = "Bob"
         repository.commit(&person)
-        try repository.save(to: storeURL, with: serializer)
-        try repository.load(from: storeURL, with: serializer)
+        try repository.saveJSON(to: storeURL)
+        try repository = MonolithicRepository(withJSONAt: storeURL)
         let fetchedPerson: Person? = repository.fetchValue(identifiedBy: person.metadata.uniqueIdentifier)
         XCTAssertEqual(fetchedPerson!.name, "Bob")
     }
@@ -53,8 +52,8 @@ class SerializationTests: XCTestCase {
         
         repository.commit(&parent)
         
-        try repository.save(to: storeURL, with: serializer)
-        try repository.load(from: storeURL, with: serializer)
+        try repository.saveJSON(to: storeURL)
+        try repository = MonolithicRepository(withJSONAt: storeURL)
         
         let fetchedParent: Parent? = repository.fetchValue(identifiedBy: parent.metadata.uniqueIdentifier)
         XCTAssertEqual(fetchedParent!.child.age, 14)

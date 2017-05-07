@@ -14,13 +14,6 @@ public class ConflictResolver {
 //    }
 }
 
-
-public protocol ForestSerializer {
-    func load(from url:URL) throws -> Forest
-    func save(_ forest:Forest, to url:URL) throws
-}
-
-
 public struct Forest: Sequence {
     private var valueTreesByReference = [ValueTreeReference:ValueTree]()
     

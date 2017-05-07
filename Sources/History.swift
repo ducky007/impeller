@@ -14,10 +14,10 @@ enum HistoryError: Error {
 
 struct History {
     let repositoryIdentifier: RepositoryIdentifier
-    private var commitsByIdentifier: [CommitIdentifier:Commit] = [:]
-    private (set) var head: CommitIdentifier?                   // Current local head
-    private (set) var detachedHeads: Set<CommitIdentifier> = [] // Local heads branched from past
-    private (set) var remoteHeads: Set<CommitIdentifier> = []   // Heads created remotely
+    var commitsByIdentifier: [CommitIdentifier:Commit] = [:]
+    var head: CommitIdentifier?                   // Current local head
+    var detachedHeads: Set<CommitIdentifier> = [] // Local heads branched from past
+    var remoteHeads: Set<CommitIdentifier> = []   // Heads created remotely
     
     init(repositoryIdentifier: RepositoryIdentifier) {
         self.repositoryIdentifier = repositoryIdentifier

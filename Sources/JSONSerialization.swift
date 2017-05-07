@@ -13,6 +13,10 @@ public enum JSONSerializationError: Error {
     case invalidMetadata
     case invalidFormat(reason: String)
     case invalidProperty(reason: String)
+    case invalidMonolithicRepository(reason: String)
+    case invalidForest(reason: String)
+    case invalidHistory(reason: String)
+    case invalidCommit(reason: String)
 }
 
 
@@ -22,36 +26,83 @@ protocol JSONRepresentable {
 }
 
 
-public class JSONForestSerializer: ForestSerializer {
+extension MonolithicRepository {
     
-    public init() {}
-    
-    public func load(from url:URL) throws -> Forest {
-        let data = try Data(contentsOf: url)
-        guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] else {
-            throw JSONSerializationError.invalidFormat(reason: "JSON root was not a dictionary")
-        }
-        let trees = try dict.map { (_, json) in try ValueTree(withJSONRepresentation: json) }
-        return Forest(valueTrees: trees)
+    private enum JSONKey: String {
+        case history, forest, uniqueIdentifier
     }
     
-    public func save(_ forest:Forest, to url:URL) throws {
-        var json = [String:Any]()
-        for tree in forest {
-            let key = tree.valueTreeReference.asString
-            json[key] = tree.JSONRepresentation()
+    public convenience init(withJSONAt url:URL) throws {
+        let data = try Data(contentsOf: url)
+        guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] else {
+            throw JSONSerializationError.invalidFormat(reason: "JSON root was not a dictionary")
         }
-        let data = try JSONSerialization.data(withJSONObject: json, options: [])
+        try self.init(withJSONRepresentation: json)
+    }
+    
+    public convenience init(withJSONRepresentation json: Any) throws {
+        self.init()
+        
+        guard
+            let json = json as? [String:Any],
+            let forestData = json[JSONKey.forest.rawValue],
+            let historyData = json[JSONKey.history.rawValue],
+            let uniqueIdentifier = json[JSONKey.uniqueIdentifier.rawValue] as? UniqueIdentifier else {
+            throw JSONSerializationError.invalidMonolithicRepository(reason: "No valid repo found")
+        }
+        
+        self.uniqueIdentifier = uniqueIdentifier
+        self.forest = try Forest(withJSONRepresentation: forestData)
+        self.history = try History(withJSONRepresentation: historyData)
+    }
+    
+    public func saveJSON(to url:URL) throws {
+        let data = try JSONSerialization.data(withJSONObject: JSONRepresentation(), options: [])
         try data.write(to: url)
+    }
+    
+    public func JSONRepresentation() -> Any {
+        var json = [String:Any]()
+        json[JSONKey.history.rawValue] = history.JSONRepresentation()
+        json[JSONKey.forest.rawValue] = forest.JSONRepresentation()
+        json[JSONKey.uniqueIdentifier.rawValue] = uniqueIdentifier
+        return json
     }
     
 }
 
 
+extension Forest: JSONRepresentable {
+    private enum JSONKey: String {
+        case valueTrees
+    }
+    
+    public init(withJSONRepresentation json: Any) throws {
+        guard
+            let json = json as? [String:Any],
+            let valueTreeDicts = json[JSONKey.valueTrees.rawValue] as? [String:Any] else {
+            throw JSONSerializationError.invalidForest(reason: "No value trees found")
+        }
+        
+        let trees = try valueTreeDicts.map { (_, json) in try ValueTree(withJSONRepresentation: json) }
+        self.init(valueTrees: trees)
+    }
+    
+    public func JSONRepresentation() -> Any {
+        var treesDict = [String:Any]()
+        for tree in self {
+            let key = tree.valueTreeReference.asString
+            treesDict[key] = tree.JSONRepresentation()
+        }
+        return [JSONKey.valueTrees.rawValue: treesDict]
+    }
+}
+
+
 extension ValueTree: JSONRepresentable {
     
-    public enum JSONKey: String {
-        case metadata, repositedType, uniqueIdentifier, commitIdentifier, isDeleted, propertiesByName, timestampsByPropertyName, ancestry
+    private enum JSONKey: String {
+        case metadata, repositedType, uniqueIdentifier, commitIdentifier, isDeleted, propertiesByName, timestampsByPropertyName, ancestry, commits
     }
     
     public init(withJSONRepresentation json: Any) throws {
@@ -115,7 +166,7 @@ extension ValueTree: JSONRepresentable {
 
 extension Property: JSONRepresentable {
     
-    public enum JSONKey: String {
+    private enum JSONKey: String {
         case propertyType, primitiveType, value, referencedType, referencedIdentifier, referencedIdentifiers, referencedCommits, referencedCommitIdentifier
     }
     
@@ -230,10 +281,10 @@ extension Property: JSONRepresentable {
     private init(withReferenceDictionary dict: [String:Any]) throws {
         guard
             let referencedType = dict[JSONKey.referencedType.rawValue] as? String,
-            let referencedIdentifier = dict[JSONKey.referencedIdentifier.rawValue] as? String,
-            let commitIdentifier = dict[JSONKey.referencedCommitIdentifier.rawValue] as? String else {
+            let referencedIdentifier = dict[JSONKey.referencedIdentifier.rawValue] as? String else {
                 throw JSONSerializationError.invalidProperty(reason: "No primitive type or value found")
         }
+        let commitIdentifier = dict[JSONKey.referencedCommitIdentifier.rawValue] as? String
         let ref = ValueTreeReference(uniqueIdentifier: referencedIdentifier, repositedType: referencedType, commitIdentifier: commitIdentifier)
         self = .valueTreeReference(ref)
     }
@@ -286,4 +337,80 @@ extension Property: JSONRepresentable {
         return result as AnyObject
     }
     
+}
+
+
+extension Commit: JSONRepresentable {
+    
+    private enum JSONKey: String {
+        case identifier, timestamp, repositoryIdentifier, predecessorIdentifier, mergedPredecessorIdentifier
+    }
+    
+    init(withJSONRepresentation json: Any) throws {
+        guard
+            let json = json as? [String:Any],
+            let identifier = json[JSONKey.identifier.rawValue] as? CommitIdentifier,
+            let timestamp = json[JSONKey.timestamp.rawValue] as? TimeInterval,
+            let repositoryIdentifier = json[JSONKey.repositoryIdentifier.rawValue] as? RepositoryIdentifier else {
+            throw JSONSerializationError.invalidCommit(reason: "No valid commit")
+        }
+        
+        self.identifier = identifier
+        self.repositoryIdentifier = repositoryIdentifier
+        self.timestamp = timestamp
+        
+        if let predecessorIdentifier = json[JSONKey.predecessorIdentifier.rawValue] as? CommitIdentifier {
+            let mergedIdentifier = json[JSONKey.mergedPredecessorIdentifier.rawValue] as? CommitIdentifier
+            self.lineage = CommitLineage(predecessor: predecessorIdentifier, mergedPredecessor: mergedIdentifier)
+        }
+        else {
+            self.lineage = nil
+        }
+    }
+    
+    func JSONRepresentation() -> Any {
+        var result = [String:Any]()
+        result[JSONKey.identifier.rawValue] = identifier
+        result[JSONKey.timestamp.rawValue] = timestamp
+        result[JSONKey.repositoryIdentifier.rawValue] = repositoryIdentifier
+        result[JSONKey.predecessorIdentifier.rawValue] = lineage?.predecessorIdentifier
+        result[JSONKey.mergedPredecessorIdentifier.rawValue] = lineage?.mergedPredecessorIdentifier
+        return result
+    }
+}
+
+
+extension History: JSONRepresentable {
+    
+    private enum JSONKey: String {
+        case repositoryIdentifier, commitsByIdentifier, head, detachedHeads, remoteHeads
+    }
+    
+    init(withJSONRepresentation json: Any) throws {
+        guard
+            let json = json as? [String:Any],
+            let repositoryIdentifier = json[JSONKey.repositoryIdentifier.rawValue] as? RepositoryIdentifier,
+            let commitsByIdentifier = json[JSONKey.commitsByIdentifier.rawValue] as? [CommitIdentifier: Any],
+            let detachedHeads = json[JSONKey.detachedHeads.rawValue] as? [CommitIdentifier],
+            let remoteHeads = json[JSONKey.remoteHeads.rawValue] as? [CommitIdentifier] else {
+            throw JSONSerializationError.invalidHistory(reason: "No valid JSON history")
+        }
+        
+        self.repositoryIdentifier = repositoryIdentifier
+        self.detachedHeads = Set(detachedHeads)
+        self.remoteHeads = Set(remoteHeads)
+        self.head = json[JSONKey.head.rawValue] as? CommitIdentifier
+        self.commitsByIdentifier = try commitsByIdentifier.mapValues { try Commit(withJSONRepresentation: $1) }
+    }
+    
+    func JSONRepresentation() -> Any {
+        var result = [String:Any]()
+        result[JSONKey.repositoryIdentifier.rawValue] = repositoryIdentifier
+        result[JSONKey.head.rawValue] = head
+        result[JSONKey.detachedHeads.rawValue] = Array(detachedHeads)
+        result[JSONKey.remoteHeads.rawValue] = Array(remoteHeads)
+        result[JSONKey.commitsByIdentifier.rawValue] = commitsByIdentifier.mapValues { $1.JSONRepresentation() }
+        return result
+    }
+
 }

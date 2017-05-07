@@ -9,26 +9,15 @@
 /// All data is in memory. This class does not persist data to disk,
 /// but other classes can be used to do that.
 public class MonolithicRepository: LocalRepository, Exchangable {
+    
     public var uniqueIdentifier: UniqueIdentifier = uuid()
     private let queue = DispatchQueue(label: "impeller.monolithicRepository")
-    private var forest = Forest()
-    private var history: History
+    var forest = Forest()
+    var history: History
     
     public init() {
         history = History(repositoryIdentifier: uniqueIdentifier)
-    }
-    
-    public func load(from url:URL, with serializer: ForestSerializer) throws {
-        try queue.sync {
-            try forest = serializer.load(from:url)
-        }
-    }
-    
-    public func save(to url:URL, with serializer: ForestSerializer) throws {
-        try queue.sync {
-            try serializer.save(forest, to:url)
-        }
-    }
+    }    
     
     /// Resolves conflicts and commits, and sets the value on out to resolved value.
     public func commit<T:Repositable>(_ value: inout T, resolvingConflictsWith conflictResolver: ConflictResolver = ConflictResolver()) {

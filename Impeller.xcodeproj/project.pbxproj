@@ -37,7 +37,7 @@
 		073D518F1E4CFDD60059CFD9 /* ForestPlanter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D518E1E4CFDD60059CFD9 /* ForestPlanter.swift */; };
 		073D51981E54D2F50059CFD9 /* ValueTreeHarvester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D51971E54D2F50059CFD9 /* ValueTreeHarvester.swift */; };
 		073D519A1E54D3040059CFD9 /* ForestHarvester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073D51991E54D3040059CFD9 /* ForestHarvester.swift */; };
-		0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772A0961E3A1703008E85C8 /* JSONForestSerializer.swift */; };
+		0772A0971E3A1703008E85C8 /* JSONSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772A0961E3A1703008E85C8 /* JSONSerialization.swift */; };
 		077C8B5F1E01A80B0073B628 /* RepositablePrimitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077C8B5E1E01A80B0073B628 /* RepositablePrimitive.swift */; };
 		077F2A011E43C6BE00A1FF59 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077F2A001E43C6BE00A1FF59 /* Log.swift */; };
 		07A70FF31E8C230E00007C1F /* Exchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0707B4331DFDBA8E00FE8F40 /* Exchange.swift */; };
@@ -120,7 +120,7 @@
 		073D51971E54D2F50059CFD9 /* ValueTreeHarvester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTreeHarvester.swift; sourceTree = "<group>"; };
 		073D51991E54D3040059CFD9 /* ForestHarvester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForestHarvester.swift; sourceTree = "<group>"; };
 		0744C5DC1E26B8A7005799E6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		0772A0961E3A1703008E85C8 /* JSONForestSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONForestSerializer.swift; sourceTree = "<group>"; };
+		0772A0961E3A1703008E85C8 /* JSONSerialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONSerialization.swift; sourceTree = "<group>"; };
 		077C8B5E1E01A80B0073B628 /* RepositablePrimitive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepositablePrimitive.swift; sourceTree = "<group>"; };
 		077F2A001E43C6BE00A1FF59 /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		07AB7AE01E473EF10025A33B /* Forest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Forest.swift; sourceTree = "<group>"; };
@@ -287,8 +287,8 @@
 				071B35C01E16EA3B00781F99 /* Value Trees */,
 				07052ACB1E5DFF5F0096FC42 /* Versioning */,
 				071B35C21E16EA7C00781F99 /* Local Repositories */,
+				07EFFCF31EBF9AEB0094B247 /* Serialization */,
 				0772A0991E3A1B43008E85C8 /* Fronts */,
-				0772A0981E3A1B29008E85C8 /* Forest Serializers */,
 				071B35C31E16EA8D00781F99 /* Exchange */,
 				0737AAE81DF9524D00ABBA90 /* Info.plist */,
 			);
@@ -310,20 +310,20 @@
 			path = Tests/ImpellerTests;
 			sourceTree = "<group>";
 		};
-		0772A0981E3A1B29008E85C8 /* Forest Serializers */ = {
-			isa = PBXGroup;
-			children = (
-				0772A0961E3A1703008E85C8 /* JSONForestSerializer.swift */,
-			);
-			name = "Forest Serializers";
-			sourceTree = "<group>";
-		};
 		0772A0991E3A1B43008E85C8 /* Fronts */ = {
 			isa = PBXGroup;
 			children = (
 				071B35AE1E15273E00781F99 /* CloudKitRepository.swift */,
 			);
 			name = Fronts;
+			sourceTree = "<group>";
+		};
+		07EFFCF31EBF9AEB0094B247 /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				0772A0961E3A1703008E85C8 /* JSONSerialization.swift */,
+			);
+			name = Serialization;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -543,7 +543,7 @@
 				071B35BD1E16952400781F99 /* Property.swift in Sources */,
 				07052ADF1E63559E0096FC42 /* Commit.swift in Sources */,
 				073D51981E54D2F50059CFD9 /* ValueTreeHarvester.swift in Sources */,
-				0772A0971E3A1703008E85C8 /* JSONForestSerializer.swift in Sources */,
+				0772A0971E3A1703008E85C8 /* JSONSerialization.swift in Sources */,
 				07AB7AE11E473EF10025A33B /* Forest.swift in Sources */,
 				07052ACF1E5E00DF0096FC42 /* History.swift in Sources */,
 				0737AB051DF9530C00ABBA90 /* MonolithicRepository.swift in Sources */,
