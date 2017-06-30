@@ -78,26 +78,26 @@ Unlike most data modelling frameworks (_e.g._ Core Data), Impeller is based on v
 #### Repositable Protocol
 
 You need to make your `struct`s conform to the `Repositable` protocol.
-
-    struct Task: Repositable {
-
+```Swift
+struct Task: Repositable {
+```
 The `Repositable` protocol looks like this.
+```Swift
+public protocol Repositable {
+    var metadata: Metadata { get set }
+    static var repositedType: RepositedType { get }
 
-    public protocol Repositable {
-        var metadata: Metadata { get set }
-        static var repositedType: RepositedType { get }
-    
-        init?(readingFrom reader:PropertyReader)
-        mutating func write(to writer:PropertyWriter)
-    }
-
+    init?(readingFrom reader:PropertyReader)
+    mutating func write(to writer:PropertyWriter)
+}
+```
 #### Metadata
 
 Your new type must supply a property for metadata storage.
-
-     struct Task: Repositable {
-        var metadata = Metadata()
-
+```Swift
+struct Task: Repositable {
+    var metadata = Metadata()
+```
 The `metadata` property is used internally by the framework, and you should generally refrain from modifying it. 
 
 One exception to this rule is the `uniqueIdentifier`, which is a global identifier for your value, and is used to store it and fetch it from repositories (persistent stores and cloud storage). By default, a _UUID_ will be generated for new values, but you can override this and set metadata with a carefully chosen `uniqueIdentifier`. You might do this in order to make shared values that appear on all devices, such as with a global settings struct. Setting a custom `uniqueIdentifer` is analogous to creating a singleton in your app.
@@ -105,14 +105,14 @@ One exception to this rule is the `uniqueIdentifier`, which is a global identifi
 #### Properties
 
 The properties of your `struct` can be anything supported by Swift. Properties are not persisted to a repository by default, so you can also include properties that you don't wish to have stored.
+```Swift
+struct Task: Repositable {
+    ...
 
-     struct Task: Repositable {
-        ...
-         
-        var text = ""
-        var tagList = TagList()
-        var isComplete = false
-
+    var text = ""
+    var tagList = TagList()
+    var isComplete = false
+```
 #### Loading Data
 
 You save and load data with Impeller in much the same way you do when using the `NSCoding` protocol included in the `Foundation` framework. You need to implement
@@ -121,13 +121,13 @@ You save and load data with Impeller in much the same way you do when using the 
 2. A function to write the `struct` data into a repository for saving.
 
 The initializer might look like this
-
-        init?(readingFrom reader:PropertyReader) {
-            text = reader.read("text")!
-            tagList = reader.read("tagList")!
-            isComplete = reader.read("isComplete")!
-        }
-
+```Swift
+init?(readingFrom reader:PropertyReader) {
+    text = reader.read("text")!
+    tagList = reader.read("tagList")!
+    isComplete = reader.read("isComplete")!
+}
+```
 The keys passed in are conventionally named the same as your properties, but this is not a necessity. You might find it useful to create an `enum` with `String` raw values to define these keys, rather than using literal values.
 
 #### Which Data Types are Supported?
@@ -146,13 +146,13 @@ These types are the only ones supported by repositories, but this does not mean 
 #### Storing Data
 
 The function for storing data into a repository makes use of methods in the `PropertyWriter`.
-
-        mutating func write(to writer:PropertyWriter) {
-            writer.write(text, for: "text")
-            writer.write(&tagList, for: "tagList")
-            writer.write(isComplete, for: "isComplete")
-        }
-
+```Swift
+mutating func write(to writer:PropertyWriter) {
+    writer.write(text, for: "text")
+    writer.write(&tagList, for: "tagList")
+    writer.write(isComplete, for: "isComplete")
+}
+```
 This is the inverse of loading data, so the keys used must correspond to the keys used in the initializer above.
 
 ### Repositories
@@ -162,15 +162,15 @@ Places where data gets stored are referred to as _repositories_, in keeping with
 #### Creating a Repository
 
 Each repository type has a different setup. Typically, you simply initialize the repository, and store it in an instance variable on a controller object.
-
-    let localRepository = MonolithicRepository()
-
+```Swift
+let localRepository = MonolithicRepository()
+```
 #### Storing Changes
 
 There is no central managing object in Impeller, like the `NSManagedObjectContext` of Core Data. Instead, when you want to save a `Repositable` type, you simply ask the repository to commit it.
-
-    localRepository.commit(&task)
-
+```Swift
+localRepository.commit(&task)
+```
 This commits the whole value, which includes any sub-types in the value tree which descend from `task`.
 
 Note that the `commit` function takes an `inout` parameter, meaning you must pass in a variable, not a constant. The reason for this is that when storing into a repository, the metadata of the stored types (_e.g._ timestamps) get updated to mirror the latest state in the repository. In addition, the value passed in may be merged with data in the store, and thus updated by the commit.
@@ -182,24 +182,24 @@ You can use Impeller as a local store, but most modern apps need to sync data ac
 #### Creating an Exchange
 
 Like the repositories, you usually create an _Exchange_ just after your app launches, and you have created all repositories. You could also do it using a lazy property, like this
-
-    lazy var exchange: Exchange = { 
-        Exchange(coupling: [self.localRepository, self.cloudRepository], pathForSavedState: nil) 
-    }()
-
+```Swift
+lazy var exchange: Exchange = { 
+    Exchange(coupling: [self.localRepository, self.cloudRepository], pathForSavedState: nil) 
+}()
+```
 #### Exchanging Data
 
 To trigger an exchange of the recent changes between repositories, simply call the `exchange` function.
-
-        exchange.exchange { error in            
-            if let error = error {
-                print("Error during exchange: \(error)")
-            }
-            else {
-                // Refresh UI here
-            }
-        }
-
+```Swift
+exchange.exchange { error in            
+    if let error = error {
+        print("Error during exchange: \(error)")
+    }
+    else {
+        // Refresh UI here
+    }
+}
+```
 The `exchange` function is asynchronous, with a completion callback, because it typically involves 'slow' network requests.
 
 ### Merging
@@ -207,9 +207,9 @@ The `exchange` function is asynchronous, with a completion callback, because it 
 When committing changes to a repository, it is possible that the repository value has been changed by another commit or exchange since the value was originally fetched. It is important to detect this eventuality, so that changes are not overwritten by the stale values in memory. There are plans to offer powerful merging in future, but at the moment only very primitive support is available.
 
 You can implement 
-
-    func resolvedValue(forConflictWith newValue:Repositable, context: Any?) -> Self
-
+```Swift
+func resolvedValue(forConflictWith newValue:Repositable, context: Any?) -> Self
+```
 from the `Repositable` protocol in your `struct`. By default, this function will do a generic merge, favoring the values in `self`, thus giving the values currently in memory precedence. You can override that behavior to return a different `struct` value, which will be what gets stored in the repository (...and returned from the `commit` function).
 
 ### Gotchas
@@ -250,31 +250,31 @@ While it is not possible to create cyclic graphs of related values, you can use 
 #### Copying Sub-Values
 
 Repositable `struct`s can contain other repositable values, forming a tree, but there is nothing to stop you from copying a sub-value into a different variable. For example
+```Swift
+struct Child: Repositable {
+    ...
+}
 
-    struct Child: Repositable {
-        ...
-    }
-    
-    struct Person: Repositable {
-        ...
-        var child: Child
-    }
-    
-    var dave = Person()
-    var child = dave.child
-    child.name = "Tom"
-    repository.commit(&child)
+struct Person: Repositable {
+    ...
+    var child: Child
+}
 
+var dave = Person()
+var child = dave.child
+child.name = "Tom"
+repository.commit(&child)
+```
 In this code, the `Child` of the value `dave` gets copied into a separate variable, altered, and then committed. It is important to realize that — as far as the repository is concerned — this is the same as changing the `child` property of `dave` directly and committing that. The two copies of the `Child` have the same `uniqueIdentifier`, and represent the same data in the repository. 
 
 If the intention was to make a new, independent child, it would be necessary to reset the metadata, like this
-
-    var dave = Person()
-    var child = dave.child
-    child.metadata = Metadata()
-    child.name = "Tom"
-    repository.commit(&child)
-
+```Swift
+var dave = Person()
+var child = dave.child
+child.metadata = Metadata()
+child.name = "Tom"
+repository.commit(&child)
+```
 This code would create a whole new `Child` value in the repository, which would be unrelated to the original `Person`.
 
 #### Trees with Variable Depth
