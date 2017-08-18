@@ -12,10 +12,6 @@ import CloudKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
-    override class func initialize() {
-        Log.level = .verbose
-    }
 
     var window: UIWindow?
     var tasksViewController: TasksViewController!
@@ -31,6 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var exchange: Exchange = { Exchange(coupling: [self.localRepository, self.cloudRepository], pathForSavedState: nil) }()
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
+        Log.level = .verbose
+
         if FileManager.default.fileExists(atPath: storeURL.path) {
             try? localRepository.load(from: storeURL, with: serializer)
         }

@@ -22,7 +22,7 @@ public protocol Repositable {
 
 public extension Repositable {
     static var repositedType: RepositedType {
-        let baseType = "\(type(of: self))" // Includes .Type
+        let baseType = "\(self)" // Includes .Type
         let type = baseType.characters.split(separator: ".").first!
         return String(type)
     }

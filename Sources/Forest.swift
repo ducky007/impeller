@@ -9,6 +9,9 @@
 import Foundation
 
 public class ConflictResolver {
+    
+    public init() {}
+    
 //    func resolved(fromConflictOf valueTree: ValueTree, with otherValueTree: ValueTree) -> ValueTree {
 //        return valueTree.metadata.commitTimestamp >= otherValueTree.metadata.commitTimestamp ? valueTree : otherValueTree
 //    }
@@ -45,7 +48,7 @@ public struct Forest: Sequence {
     }
     
     public mutating func deleteValueTrees(descendantFrom reference: ValueTreeReference) {
-        let timestamp = Date.timeIntervalSinceReferenceDate
+//        let timestamp = Date.timeIntervalSinceReferenceDate
         let plantedTree = PlantedValueTree(forest: self, root: reference)
         for path in plantedTree {
             var tree = valueTree(at: path.valueTreeReference)!
